@@ -1,12 +1,14 @@
 export type User = {
-  username: string
-  email?: string
+  email: string
   password: string
   token?: string
+  role?: string
 }
 
 export type Registered = {
-  username: string
+  lastName: string
+  firstName: string
+  phone: string
   email: string
   password: string
 }
