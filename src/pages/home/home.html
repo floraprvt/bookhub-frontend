@@ -1,2 +1,107 @@
-<h2>Welcome to our Authentication App</h2>
-<p>Please register or login to access your profile.</p>
+<div class="flex justify-between p-12 items-center flex-col md:flex-row">
+  <div class="inline-flex border-b border-black pb-5 w-fit mt-8">
+    <h2 class="font-bold text-2xl text-black mr-4 lg:mr-20">Filtres</h2>
+    <div class="inline-flex flex-row gap-2 sm:gap-6 lg:gap-4 flex-wrap text-sm sm:text-xl lg:text-base">
+
+      <label>
+        <input name="category" type="radio" class="peer hidden"
+               [checked]="selectedCategory() === 'all'"
+               (change)="onCategoryChange('all')" />
+        <p class="shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border peer-checked:bg-[#162D3A] text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Voir tout</p>
+      </label>
+
+      <label>
+        <input name="category" type="radio" class="peer hidden"
+               [checked]="selectedCategory() === 'moteur'"
+               (change)="onCategoryChange('moteur')" />
+        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Categorie</p>
+      </label>
+
+      <label>
+        <input name="category" type="radio" class="peer hidden"
+               [checked]="selectedCategory() === 'freinage'"
+               (change)="onCategoryChange('freinage')" />
+        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Disponibilité</p>
+      </label>
+
+      <label>
+        <input name="category" type="radio" class="peer hidden"
+               [checked]="selectedCategory() === 'freinage'"
+               (change)="onCategoryChange('freinage')" />
+        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Note</p>
+      </label>
+
+      <label>
+        <input name="category" type="radio" class="peer hidden"
+               [checked]="selectedCategory() === 'freinage'"
+               (change)="onCategoryChange('freinage')" />
+        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Auteur</p>
+      </label>
+    </div>
+  </div>
+
+  <button class="flex mt-4 md:mt-0 gap-3 font-semibold text-xl cursor-pointer h-fit bg-[#162D3A] text-white p-4 px-12 rounded-full w-fit items-center hover:bg-opacity-90 transition-all">
+    Recherche
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+  </button>
+</div>
+
+<div>
+  <div class="flex justify-center my-8 gap-8 flex-wrap">
+
+    @for(product of filteredProducts(); track product.title) {
+      <app-cards
+        [title]="product.title"
+        [category]="product.category"
+        [autor]="product.autor"
+        [imageSrc]="product.imageSrc"
+        [lien]="product.lien"
+        [alt]="product.alt"
+        [isAvailable]="product.isAvailable"
+      />
+    }
+
+    @if(filteredProducts().length === 0) {
+      <div class="w-full text-center mt-12">
+        <p class="text-gray-500 text-xl font-medium">Aucun produit trouvé dans cette catégorie.</p>
+      </div>
+    }
+  </div>
+  @if(totalPages() > 1) {
+    <div class="flex justify-center items-center gap-4 my-10">
+
+      <button
+        (click)="prevPage()"
+        [disabled]="currentPage() === 1"
+        class="px-6 py-2 rounded-full font-medium transition-colors cursor-pointer"
+        [class.bg-gray-200]="currentPage() === 1"
+        [class.text-gray-400]="currentPage() === 1"
+        [class.bg-[#162D3A]]="currentPage() > 1"
+        [class.text-white]="currentPage() > 1"
+        [class.hover:bg-opacity-90]="currentPage() > 1"
+        [class.cursor-not-allowed]="currentPage() === 1">
+
+        Précédent
+      </button>
+
+      <span class="font-medium text-lg">
+        Page {{ currentPage() }} sur {{ totalPages() }}
+      </span>
+
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage() === totalPages()"
+        class="px-6 py-2 rounded-full font-medium transition-colors cursor-pointer"
+        [class.bg-gray-200]="currentPage() === totalPages()"
+        [class.text-gray-400]="currentPage() === totalPages()"
+        [class.bg-[#162D3A]]="currentPage() < totalPages()"
+        [class.text-white]="currentPage() < totalPages()"
+        [class.hover:bg-opacity-90]="currentPage() < totalPages()"
+        [class.cursor-not-allowed]="currentPage() === totalPages()">
+      
+        Suivant
+      </button>
+
+    </div>
+  }
+</div>
