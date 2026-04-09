@@ -1,3 +1,4 @@
+@if(isLoggedIn()) {
 <nav class="shadow-lg flex p-4 gap-4 justify-between items-center px-8">
     <a routerLink="/" class="md:w-36">
         <img src="assets/logo.png" alt="logo bookhub">
@@ -40,27 +41,16 @@
         </div>
     </div>
     <div class="hidden md:flex gap-4 h-fit">
-        @if(!isLoggedIn()) {
-        <a routerLink="/register" class="">
-            S'inscrire
-        </a>
-        <a routerLink="/login" class="">
-            Se connecter
-        </a>
-        }
-        
-        @if(isLoggedIn()) {
-            <div class="flex gap-4">
-                <a href="" class="text-blue-950 font-semibold">Catalogue</a>
-                <a href="" class="text-blue-950 font-semibold">Mes emprunts et réservations</a>
-                <a href="" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
-            </div>
-            <button 
-                (click)="logout()" 
-                class="hidden">
-                Déconnexion
-            </button>
-        }
+        <div class="flex gap-4">
+            <a href="" class="text-blue-950 font-semibold">Catalogue</a>
+            <a href="" class="text-blue-950 font-semibold">Mes emprunts et réservations</a>
+            <a href="" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
+        </div>
+        <button 
+            (click)="logout()" 
+            class="">
+            Déconnexion
+        </button>
     </div>
     @if(isLoggedIn()) {
         <div class="flex gap-4">
@@ -76,3 +66,4 @@
         </div>
     }
 </nav>
+}
