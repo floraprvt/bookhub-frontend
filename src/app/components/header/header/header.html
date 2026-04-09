@@ -1,0 +1,78 @@
+<nav class="shadow-lg flex p-4 gap-4 justify-between items-center px-8">
+    <a routerLink="/" class="md:w-36">
+        <img src="assets/logo.png" alt="logo bookhub">
+    </a>
+    
+    <input class="hidden" id="panneauDeux" name="equipe" type="radio" checked>
+    <div class="flex items-center gap-4 justify-end w-full md:hidden">
+        <div id="panneauDeux-panneau" class="flex justify-center z-20 py-4 items-center">
+            <input id="panneauUn" class="hidden menu-switch" name="equipe" type="radio">
+            <div>
+                <label for="panneauUn" class="menu-open">
+                    <div class="md:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>
+                    </div>
+                </label>
+                <div class="bg-white z-50 panneau fixed top-4 right-4 invisible opacity-0 rounded-3xl p-4" id="panneauUn-panneau">
+                    <div class="flex gap-3 items-center p-2">
+                        <label for="panneauDeux" class="menu-closed shadow-xl p-2 rounded-2xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        </label>
+                        <a href="" class="shadow-xl p-2 rounded-2xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+                        </a>
+                        <a href="" class="shadow-xl p-2 rounded-2xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+                        </a>
+                        <a href="/profil" class="shadow-xl p-2 rounded-2xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </a>
+                    </div>
+                    <div class="flex flex-col items-center justify-center gap-4 mt-4">
+                        <a href="/" class="text-blue-950 font-semibold">Catalogue</a>
+                        <hr class="border-gray-400 w-full">
+                        <a href="/" class="text-blue-950 font-semibold">Mes emprunts et réservations</a>
+                        <hr class="border-gray-400 w-full">
+                        <a href="/" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hidden md:flex gap-4 h-fit">
+        @if(!isLoggedIn()) {
+        <a routerLink="/register" class="">
+            S'inscrire
+        </a>
+        <a routerLink="/login" class="">
+            Se connecter
+        </a>
+        }
+        
+        @if(isLoggedIn()) {
+            <div class="flex gap-4">
+                <a href="" class="text-blue-950 font-semibold">Catalogue</a>
+                <a href="" class="text-blue-950 font-semibold">Mes emprunts et réservations</a>
+                <a href="" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
+            </div>
+            <button 
+                (click)="logout()" 
+                class="hidden">
+                Déconnexion
+            </button>
+        }
+    </div>
+    @if(isLoggedIn()) {
+        <div class="flex gap-4">
+            <div class="shadow-xl p-2 rounded-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+            </div>
+            <div class="shadow-xl p-2 rounded-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+            </div>
+            <a href="/profil" class="shadow-xl p-2 rounded-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </a>
+        </div>
+    }
+</nav>
