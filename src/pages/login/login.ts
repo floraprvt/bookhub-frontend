@@ -16,20 +16,20 @@ export class Login {
   private readonly router = inject(Router);
 
   user: User = {
-    username: '',
+    email: '',
     password: '',
   };
 
   onSubmit(loginForm: any) {
-    if (loginForm.valid && this.user.username && this.user.password) {
+    if (loginForm.valid && this.user.email && this.user.password) {
       // Vérification des identifiants
       if (
         this.authService.validateCredentials(
-          this.user.username,
+          this.user.email,
           this.user.password
         )
       ) {
-        this.authService.login(this.user.username, this.user.password);
+        this.authService.login(this.user.email, this.user.password);
         console.log('Connexion réussie');
         this.router.navigate(['/profil']);
       } else {

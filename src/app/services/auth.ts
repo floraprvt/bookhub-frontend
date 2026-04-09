@@ -23,27 +23,27 @@ export class AuthService {
 
   constructor() {
     // Initialisation depuis le sessionStorage
-    const storedUser = sessionStorage.getItem('currentUser')
+    const storedUser = localStorage.getItem('currentUser')
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser)
         this.currentUserSignal.set(user)
       } catch (error) {
         console.error("Erreur lors du parsing de l'utilisateur stocké:", error)
-        sessionStorage.removeItem('currentUser')
+        localStorage.removeItem('currentUser')
       }
     }
   }
 
-  login(username: string, password: string): Partial<User> {
+  login(email: string, password: string): Partial<User> {
     // Simulation d'une authentification
     const user: Partial<User> = {
-      username,
+      email,
       token: 'fake-jwt-token',
     }
 
     // Sauvegarde en sessionStorage
-    sessionStorage.setItem('currentUser', JSON.stringify(user))
+    localStorage.setItem('currentUser', JSON.stringify(user))
 
     // Mise à jour du signal
     this.currentUserSignal.set(user)
@@ -53,7 +53,7 @@ export class AuthService {
 
   logout(): void {
     // Suppression de la session
-    sessionStorage.removeItem('currentUser')
+    localStorage.removeItem('currentUser')
 
     // Mise à jour du signal
     this.currentUserSignal.set(null)
@@ -62,9 +62,11 @@ export class AuthService {
   register(userData: Registered): boolean {
     const users = this.getStoredUsers()
     users.push({
-      username: userData.username,
       email: userData.email,
-      password: userData.password, // En production, il faudrait hasher le mot de passe
+      password: userData.password,
+      lastName: userData.lastName,
+      firstName: userData.firstName,
+      phone: userData.phone
     })
     localStorage.setItem('users', JSON.stringify(users))
     return true
@@ -75,10 +77,10 @@ export class AuthService {
     return stored ? JSON.parse(stored) : []
   }
 
-  validateCredentials(username: string, password: string): boolean {
+  validateCredentials(email: string, password: string): boolean {
     const users = this.getStoredUsers()
     return users.some(
-      (user) => user.username === username && user.password === password
+      (user) => user.email === email && user.password === password
     )
   }
 }

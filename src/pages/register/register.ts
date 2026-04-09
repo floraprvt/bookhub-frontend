@@ -15,9 +15,11 @@ export class Register {
   private readonly router = inject(Router);
 
   user: Registered = {
-    username: '',
+    lastName: '',
+    firstName: '',
     email: '',
     password: '',
+    phone: ''
   };
 
   onSubmit(registerForm: any) {
