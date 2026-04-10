@@ -3,7 +3,7 @@
     <a routerLink="/" class="md:w-36">
         <img src="assets/logo.png" alt="logo bookhub">
     </a>
-    
+
     <input class="hidden" id="panneauDeux" name="equipe" type="radio" checked>
     <div class="flex items-center gap-4 justify-end w-full md:hidden">
         <div id="panneauDeux-panneau" class="flex justify-center z-20 py-4 items-center">
@@ -46,11 +46,6 @@
             <a href="" class="text-blue-950 font-semibold">Mes emprunts et réservations</a>
             <a href="" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
         </div>
-        <button 
-            (click)="logout()" 
-            class="">
-            Déconnexion
-        </button>
     </div>
     @if(isLoggedIn()) {
         <div class="flex gap-4">
