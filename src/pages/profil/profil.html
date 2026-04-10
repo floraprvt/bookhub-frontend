@@ -1,42 +1,161 @@
-<div class="min-h-screen bg-gray-100 py-12">
-  <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-      <div class="px-4 py-5 sm:p-6">
-        <div class="border-t border-gray-200 pt-6">
-          <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-            <div class="sm:col-span-1">
-              <dt class="text-sm font-medium text-gray-500">Statut</dt>
-              <dd class="mt-1">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                >
-                  Connecté
-                </span>
-              </dd>
-            </div>
-             {{ currentUser()?.lastName || "Aucun nom"}}
-            <div class="sm:col-span-2">
-              <dt class="text-sm font-medium text-gray-500">
-                Token d'authentification
-              </dt>
-              <dd
-                class="mt-1 text-sm text-gray-900 font-mono bg-gray-100 px-3 py-2 rounded border"
-              >
-                {{ currentUser()?.token || "Aucun token" }}
-              </dd>
-            </div>
+<div class="min-h-screen bg-gray-50 p-4 md:p-8">
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
 
-            <div class="sm:col-span-2">
-              <dt class="text-sm font-medium text-gray-500">
-                Date de connexion
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900">
-                {{ currentUser() ? (today | date) : "Non connecté" }}
-              </dd>
+    <aside class="w-full lg:w-1/3 xl:w-1/4">
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+
+        <div class="flex items-center gap-3 mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <h2 class="text-2xl font-bold">Mon profil</h2>
+        </div>
+
+        <form (ngSubmit)="updateProfile()" class="flex flex-col gap-4">
+          <div class="relative">
+            <input type="text" name="firstName" [(ngModel)]="user().firstName" placeholder="Prénom" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 outline-none">
+          </div>
+
+          <div class="relative">
+            <input type="text" name="lastName" [(ngModel)]="user().lastName" placeholder="Nom" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 outline-none">
+          </div>
+
+          <div class="relative">
+            <input type="email" name="email" [(ngModel)]="user().email" placeholder="Email" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-500 outline-none" readonly>
+          </div>
+
+          <div class="relative">
+            <input type="tel" name="phone" [(ngModel)]="user().phone" placeholder="Téléphone" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 outline-none">
+          </div>
+
+          <button type="submit" class="mt-4 w-full bg-[#162D3A] hover:bg-blue-950 text-white font-medium py-3 rounded-lg transition-colors">
+            Modifier mes informations
+          </button>
+
+          <button type="button" class="text-[#162D3A] font-medium text-sm hover:underline">
+            Changer mon mot de passe
+          </button>
+
+          <hr class="my-2 border-gray-200">
+
+          <button type="button" (click)="deleteAccount()" class="w-full bg-red-700 hover:bg-red-800 text-white font-medium py-3 rounded-lg transition-colors">
+            Supprimer mon compte
+          </button>
+          <p class="text-center text-xs text-gray-500">Action irréversible</p>
+
+          <hr class="my-2 border-gray-200">
+
+          <button (click)="logout()" class="w-full bg-[#162D3A] hover:bg-blue-950 text-white font-medium py-3 rounded-lg transition-colors">
+            Déconnexion
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="w-full lg:w-2/3 xl:w-3/4 flex flex-col gap-6">
+
+      <div class="flex items-center gap-3 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-800"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        <h1 class="text-3xl font-bold text-slate-800">Mon tableau de bord</h1>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+          <h3 class="text-xl font-bold mb-4">Mes emprunts en cours</h3>
+
+          <div class="flex overflow-x-auto gap-4 snap-x pb-2">
+            @for(book of borrows(); track book.id) {
+              <div class="snap-start shrink-0 w-full sm:w-[320px] bg-gray-50 rounded-2xl p-3 flex gap-4 border border-gray-200">
+                <img [src]="book.coverUrl" [alt]="book.title" class="w-20 h-28 object-cover rounded-lg shadow-sm bg-gray-200">
+                <div class="flex flex-col justify-between flex-1">
+                  <div>
+                    <h4 class="font-bold text-sm line-clamp-2">{{ book.title }}</h4>
+                    <p class="text-xs text-gray-500">{{ book.author }}</p>
+                  </div>
+
+                  @if(book.isOverdue) {
+                    <div class="bg-red-700 text-white text-xs text-center p-2 rounded-lg mt-2">
+                      <span class="font-bold block flex items-center justify-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        EN RETARD
+                      </span>
+                      {{ book.dueDate | date:'dd/MM/yyyy' }}
+                    </div>
+                  } @else {
+                    <div class="bg-emerald-100 text-emerald-800 text-xs text-center p-2 rounded-lg mt-2 border border-emerald-200">
+                      <span class="font-bold block">{{ book.daysRemaining }} jours</span>
+                      restants
+                    </div>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="text-gray-400 italic">Aucun emprunt en cours.</p>
+            }
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+          <h3 class="text-xl font-bold mb-4">Mes réservations</h3>
+
+          <div class="flex overflow-x-auto gap-4 snap-x pb-2 hide-scrollbar">
+            @for(book of reservations(); track book.id) {
+              <div class="snap-start shrink-0 w-full sm:w-[320px] bg-gray-50 rounded-2xl p-3 flex gap-4 border border-gray-200">
+                <img [src]="book.coverUrl" [alt]="book.title" class="w-20 h-28 object-cover rounded-lg shadow-sm bg-gray-200">
+                <div class="flex flex-col justify-between flex-1">
+                  <div>
+                    <h4 class="font-bold text-sm line-clamp-2">{{ book.title }}</h4>
+                    <p class="text-xs text-gray-500">{{ book.author }}</p>
+                    <p class="text-sm font-medium mt-1">Note : {{ book.currentRank }}/{{ book.totalRank }}</p>
+                  </div>
+                  <button (click)="cancelReservation(book.id)" class="bg-gray-500 hover:bg-gray-600 text-white text-xs font-medium py-2 rounded-lg mt-2 transition-colors">
+                    Annuler la réservation
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <p class="text-gray-400 italic">Aucune réservation en cours.</p>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+        <h3 class="text-xl font-bold mb-4">Mon historique de lecture</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          @for(book of history(); track book.id) {
+            <div class="bg-gray-50 rounded-2xl p-4 flex gap-4 border border-gray-200 items-center justify-between">
+              <div class="flex gap-4 items-center">
+                <img [src]="book.coverUrl" [alt]="book.title" class="w-16 h-24 object-cover rounded-lg shadow-sm bg-gray-200">
+                <div>
+                  <h4 class="font-bold text-sm">{{ book.title }}</h4>
+                  <p class="text-xs text-gray-500">Auteur : {{ book.author }}</p>
+                  <p class="text-xs text-gray-500 mt-1">Date retournée : {{ book.returnedDate | date:'MM/yyyy' }}</p>
+                </div>
+              </div>
+
+              <div class="flex flex-col items-end gap-2">
+                <button class="bg-[#162D3A] hover:bg-blue-950 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+                  Noter & Commenter
+                </button>
+                <div class="flex gap-1">
+                  @for(star of starsArray; track star) {
+                    <svg
+                      (click)="rateBook(book.id, star)"
+                      xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="cursor-pointer transition-colors"
+                      [ngClass]="star <= book.rating ? 'fill-[#162D3A] text-[#162D3A]' : 'fill-none text-gray-300'">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  }
+                </div>
+              </div>
             </div>
-          </dl>
+          }
         </div>
       </div>
-    </div>
+    </main>
   </div>
 </div>
