@@ -49,7 +49,7 @@
 <div>
   <div class="flex justify-center my-8 gap-8 flex-wrap">
 
-    @for(product of filteredProducts(); track product.title) {
+    @for(product of paginatedProducts(); track $index) {
       <app-cards
         [title]="product.title"
         [category]="product.category"
@@ -98,7 +98,7 @@
         [class.text-white]="currentPage() < totalPages()"
         [class.hover:bg-opacity-90]="currentPage() < totalPages()"
         [class.cursor-not-allowed]="currentPage() === totalPages()">
-      
+
         Suivant
       </button>
 
