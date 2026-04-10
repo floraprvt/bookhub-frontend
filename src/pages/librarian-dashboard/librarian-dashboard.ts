@@ -1,5 +1,9 @@
-import { Component, signal, OnInit } from '@angular/core'
+import { Component, signal, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { RouterLink, RouterLinkActive } from '@angular/router'
+import { Chart, registerables } from 'chart.js'
+
+Chart.register(...registerables)
 
 export interface DashboardStats {
   totalBooks: number
@@ -27,10 +31,12 @@ export interface TopBook {
 @Component({
   selector: 'app-librarian-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './librarian-dashboard.html'
 })
-export class LibrarianDashboard implements OnInit {
+export class LibrarianDashboard implements OnInit, AfterViewInit {
+  @ViewChild('borrowChart') borrowChart!: ElementRef
+
   librarianName = signal<string>('Ahmed')
 
   stats = signal<DashboardStats>({
@@ -44,6 +50,41 @@ export class LibrarianDashboard implements OnInit {
 
   ngOnInit() {
     this.loadData()
+  }
+
+  ngAfterViewInit() {
+    const canvas = document.getElementById('borrowChart') as HTMLCanvasElement;
+
+    if (canvas) {
+      new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
+          datasets: [{
+            label: 'Emprunts',
+            data: [120, 150, 180, 170, 220, 285],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
   }
 
   loadData() {
@@ -74,11 +115,7 @@ export class LibrarianDashboard implements OnInit {
       { id: '1', rank: 1, title: 'Le Petit Prince', author: '1984', borrowCount: 120, coverUrl: 'assets/arsene.jpg' },
       { id: '2', rank: 2, title: 'Astérix', author: 'Astérix', borrowCount: 60, coverUrl: 'assets/arsene.jpg' },
       { id: '3', rank: 3, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.jpg' },
-      { id: '4', rank: 4, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.jpg' },
-      { id: '5', rank: 5, title: 'Marie Curie', author: 'Auteur Curie', borrowCount: 70, coverUrl: 'assets/arsene.jpg' },
-      { id: '6', rank: 6, title: 'L\'Étranger', author: 'Delir Pope', borrowCount: 20, coverUrl: 'assets/arsene.jpg' },
-      { id: '7', rank: 8, title: 'Noter tecrvations', author: 'Auteur Vislan', borrowCount: 30, coverUrl: 'assets/arsene.jpg' },
-      { id: '8', rank: 10, title: 'Le Petit Princ...', author: 'Auteur HauviliviRon', borrowCount: 10, coverUrl: 'assets/arsene.jpg' }
+      { id: '4', rank: 4, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.jpg' }
     ])
   }
 
