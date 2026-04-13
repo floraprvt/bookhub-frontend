@@ -115,7 +115,13 @@ export class LibrarianDashboard implements OnInit, AfterViewInit {
       { id: '1', rank: 1, title: 'Le Petit Prince', author: '1984', borrowCount: 120, coverUrl: 'assets/arsene.jpg' },
       { id: '2', rank: 2, title: 'Astérix', author: 'Astérix', borrowCount: 60, coverUrl: 'assets/arsene.jpg' },
       { id: '3', rank: 3, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.jpg' },
-      { id: '4', rank: 4, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.jpg' }
+      { id: '4', rank: 4, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.jpg' },
+      { id: '5', rank: 5, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.jpg' },
+      { id: '6', rank: 6, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.jpg' },
+      { id: '7', rank: 7, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.jpg' },
+      { id: '8', rank: 8, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.jpg' },
+      { id: '9', rank: 9, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.jpg' },
+      { id: '10', rank: 10, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.jpg' },
     ])
   }
 
