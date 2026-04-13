@@ -35,21 +35,28 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string): Partial<User> {
-    // Simulation d'une authentification
-    const user: Partial<User> = {
-      email,
+  login(email: string, password: string): Partial<User> | null {
+
+  const users = this.getStoredUsers();
+  const foundUser = users.find(u => u.email === email);
+
+  if (foundUser) {
+    const userToStore: Partial<User> = {
+      email: foundUser.email,
+      lastName: foundUser.lastName,
+      firstName: foundUser.firstName,
+      phone: foundUser.phone,
       token: 'fake-jwt-token',
-    }
+    };
 
-    // Sauvegarde en sessionStorage
-    localStorage.setItem('currentUser', JSON.stringify(user))
+    localStorage.setItem('currentUser', JSON.stringify(userToStore));
+    this.currentUserSignal.set(userToStore);
 
-    // Mise à jour du signal
-    this.currentUserSignal.set(user)
-
-    return user
+    return userToStore;
   }
+  
+  return null;
+}
 
   logout(): void {
     // Suppression de la session
