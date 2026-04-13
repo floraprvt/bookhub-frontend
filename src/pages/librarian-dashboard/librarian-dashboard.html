@@ -54,9 +54,9 @@
           <div class="bg-red-50 rounded-3xl p-6 shadow-sm border border-red-100 flex items-center justify-between">
             <div>
               <p class="text-red-700 font-medium mb-1">Retards Actuels</p>
-              <p class="text-4xl font-bold text-red-600">{{ stats().currentOverdues }}</p>
+              <p class="text-4xl font-bold text-red-700">{{ stats().currentOverdues }}</p>
             </div>
-            <div class="bg-red-600 p-3 rounded-full text-white shadow-md">
+            <div class="bg-red-700 p-3 rounded-full text-white shadow-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
           </div>
@@ -91,7 +91,7 @@
                     <td class="py-4 text-slate-700">{{ overdue.daysOverdue }} jours</td>
                     <td class="py-4 text-center">
                       @if(overdue.daysOverdue > 5) {
-                        <button (click)="relancer(overdue.id)" class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-1.5 rounded-full text-sm transition-colors">
+                        <button (click)="relancer(overdue.id)" class="bg-red-700 hover:bg-red-800 text-white font-medium px-4 py-1.5 rounded-full text-sm transition-colors">
                           Relancer
                         </button>
                       } @else {
