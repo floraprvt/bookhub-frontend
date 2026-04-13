@@ -11,7 +11,7 @@ export type User = {
 export type Registered = {
   lastName: string
   firstName: string
-  phone: string
+  phone?: string
   email: string
   password: string
 }

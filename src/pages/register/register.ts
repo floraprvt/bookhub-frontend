@@ -24,7 +24,7 @@ export class Register {
 
   onSubmit(registerForm: any) {
     if (registerForm.valid) {
-      this.authService.register(this.user);
+      //this.authService.register(this.user);
       console.log('Inscription réussie');
       this.router.navigate(['/login']);
     }
