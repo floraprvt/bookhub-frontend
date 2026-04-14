@@ -35,5 +35,14 @@ export class BookService {
     return this.http.put<Book>(`${API_URL}${BOOK_ENDPOINT}/${id}`, book)
   }
 
+  getRatings(bookId: number | string) {
+    return this.http.get<any[]>(`${API_URL}/api/ratings/book/${bookId}`);
+  }
+
+  addRating(bookId: number | string, score: number, comment: string) {
+    const date = new Date().toISOString().split('T')[0];
+    return this.http.post(`${API_URL}/api/ratings/book/${bookId}`, { score, comment, date });
+  }
+
   // DELETE /api/books/{id} (ADMIN)
 }
