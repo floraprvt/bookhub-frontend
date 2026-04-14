@@ -26,13 +26,48 @@
             <input type="tel" name="phone" [(ngModel)]="user().phone" placeholder="Téléphone" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 outline-none">
           </div>
 
-          <button type="submit" class="mt-4 w-full bg-[#162D3A] hover:bg-blue-950 text-white font-medium py-3 rounded-lg transition-colors">
-            Modifier mes informations
+          <button type="submit" [disabled]="isUpdating()" class="mt-4 w-full bg-[#162D3A] hover:bg-blue-950 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+            {{ isUpdating() ? 'Enregistrement...' : 'Modifier mes informations' }}
+          </button>
+          @if (updateSuccess()) {
+            <p class="text-sm text-green-600 text-center">Informations mises à jour.</p>
+          }
+          @if (updateError()) {
+            <p class="text-sm text-red-600 text-center">{{ updateError() }}</p>
+          }
+
+          <button type="button" (click)="showPasswordForm.set(!showPasswordForm())" class="text-[#162D3A] font-medium text-sm hover:underline">
+            {{ showPasswordForm() ? 'Quitter' : 'Changer mon mot de passe' }}
           </button>
 
-          <button type="button" class="text-[#162D3A] font-medium text-sm hover:underline">
-            Changer mon mot de passe
-          </button>
+          @if (showPasswordForm()) {
+            <form (ngSubmit)="changePassword()" #passwordForm="ngForm" class="flex flex-col gap-3 border-t pt-4">
+              <input
+                type="password" name="currentPassword" [(ngModel)]="currentPassword"
+                required placeholder="Mot de passe actuel"
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 outline-none text-sm"
+              />
+              <input
+                type="password" name="newPassword" [(ngModel)]="newPassword"
+                required placeholder="Nouveau mot de passe"
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 outline-none text-sm"
+              />
+              <input
+                type="password" name="confirmPassword" [(ngModel)]="confirmPassword"
+                required placeholder="Confirmer le nouveau mot de passe"
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 outline-none text-sm"
+              />
+              @if (passwordSuccess()) {
+                <p class="text-sm text-green-600 text-center">Mot de passe mis à jour.</p>
+              }
+              @if (passwordError()) {
+                <p class="text-sm text-red-600 text-center">{{ passwordError() }}</p>
+              }
+              <button type="submit" [disabled]="passwordForm.invalid || isChangingPassword()" class="w-full bg-[#162D3A] hover:bg-blue-950 text-white font-medium py-2 rounded-lg text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {{ isChangingPassword() ? 'Enregistrement...' : 'Confirmer' }}
+              </button>
+            </form>
+          }
 
           <hr class="my-2 border-gray-200">
 
