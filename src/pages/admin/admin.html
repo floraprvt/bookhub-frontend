@@ -24,7 +24,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for(user of users(); track user.id) {
+                @for(user of filteredUsers(); track user.id) {
                   <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
                     <td class="py-4 font-medium text-slate-800">{{ user.lastName }}</td>
                     <td class="py-4 text-slate-700">{{ user.firstName }}</td>
