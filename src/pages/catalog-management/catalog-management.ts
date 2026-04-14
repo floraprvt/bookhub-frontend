@@ -55,12 +55,21 @@ export class CatalogManagement implements OnInit {
   }
 
   deleteBook(book: BookCatalog) {
-    if (book.hasActiveBorrows) {
+    if (book.isAvailable === false) {
       alert("Impossible de supprimer ce livre car des emprunts sont en cours")
       return
     }
     if (confirm(`Êtes-vous sûr de vouloir supprimer ${book.title} ?`)) {
-      this.books.update(books => books.filter(b => b.id !== book.id))
+      const bookId = Number(book.id)
+      this.bookService.deleteBook(bookId).subscribe({
+        next: () => {
+          this.loadBooks()
+        },
+        error: (error: unknown) => {
+          console.error(error)
+          alert("Une erreur est survenue lors de la suppression du livre.")
+        }
+      })
     }
   }
 
@@ -80,9 +89,7 @@ export class CatalogManagement implements OnInit {
       description: bookToEdit.description,
       image: bookToEdit.image,
       date: bookToEdit.date,
-      availableCopies: bookToEdit.availableCopies,
-      totalCopies: bookToEdit.totalCopies,
-      hasActiveBorrows: bookToEdit.hasActiveBorrows
+      isAvailable: bookToEdit.isAvailable
     }
     this.isModalOpen.set(true)
   }
@@ -111,11 +118,7 @@ export class CatalogManagement implements OnInit {
       return
     }
 
-    if (this.bookForm.totalCopies < 0 || this.bookForm.availableCopies < 0) {
-      return
-    }
-
-    if (this.bookForm.availableCopies > this.bookForm.totalCopies) {
+    if (this.bookForm.isAvailable === false) {
       return
     }
 
@@ -164,9 +167,7 @@ export class CatalogManagement implements OnInit {
       description: '',
       image: '',
       date: '',
-      availableCopies: 1,
-      totalCopies: 1,
-      hasActiveBorrows: false
+      isAvailable: true
     }
   }
 
@@ -226,9 +227,7 @@ export class CatalogManagement implements OnInit {
       description: book.description ?? '',
       image: book.image ?? '',
       date: this.toDateInputValue(book.date),
-      availableCopies,
-      totalCopies,
-      hasActiveBorrows: totalCopies > availableCopies
+      isAvailable: book.isAvailable,
     }
   }
 
@@ -241,9 +240,7 @@ export class CatalogManagement implements OnInit {
       category: this.toApiCategories(selectedCategoryIds),
       image,
       date,
-      isAvailable: this.bookForm.availableCopies > 0,
-      availableCopies: this.bookForm.availableCopies,
-      totalCopies: this.bookForm.totalCopies
+      isAvailable: this.bookForm.isAvailable,
     }
     
     if (this.editingBookId()) {

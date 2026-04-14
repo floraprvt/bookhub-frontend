@@ -36,5 +36,7 @@ export class BookService {
     return this.http.put<Book>(`${API_URL}${BOOK_ENDPOINT}`, book)
   }
 
-  // DELETE /api/books/{id} (ADMIN)
+  deleteBook(id: number) {
+    return this.http.delete(`${API_URL}${BOOK_ENDPOINT}/${id}`);
+  }
 }

@@ -52,9 +52,7 @@ export interface BookCatalog {
   description: string
   image: string
   date: string
-  availableCopies: number
-  totalCopies: number
-  hasActiveBorrows: boolean
+  isAvailable: boolean
 }
 
 export interface BookFormData {
@@ -65,9 +63,7 @@ export interface BookFormData {
   description: string
   image: string
   date: string
-  availableCopies: number
-  totalCopies: number
-  hasActiveBorrows: boolean
+  isAvailable: boolean
 }
 
 export interface Loan {
