@@ -79,7 +79,9 @@
                       }
                     </div>
                   </div>
-                  <p class="text-slate-700 text-sm">"{{ review.comment }}"</p>
+                  @if(review.comment) {
+                    <p class="text-slate-700 text-sm">{{ review.comment }}</p>
+                  }
                 </div>
               } @empty {
                 <p class="text-center text-gray-500 py-4 italic">Aucun avis pour le moment. Soyez le premier à noter ce livre après l'avoir lu !</p>
