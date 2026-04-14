@@ -31,8 +31,9 @@ export class BookService {
   addBook(book: Partial<Book>) {
     return this.http.post<Book>(`${API_URL}${BOOK_ENDPOINT}`, book)
   }
-  updateBook(id: string | number, book: Partial<Book>) {
-    return this.http.put<Book>(`${API_URL}${BOOK_ENDPOINT}/${id}`, book)
+
+  updateBook(book: Partial<Book>) {
+    return this.http.put<Book>(`${API_URL}${BOOK_ENDPOINT}`, book)
   }
 
   // DELETE /api/books/{id} (ADMIN)
