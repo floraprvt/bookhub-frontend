@@ -64,12 +64,12 @@
               <tbody>
                 @for(loan of activeLoans(); track loan.id) {
                   <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                    <td class="py-4 font-medium text-slate-800">{{ loan.memberName }}</td>
+                    <td class="py-4 font-medium text-slate-800">{{ loan.firstName }} {{ loan.lastName }}</td>
                     <td class="py-4 text-slate-700">{{ loan.bookTitle }}</td>
-                    <td class="py-4 text-slate-700">{{ loan.borrowDate | date:'dd/MM/yyyy' }}</td>
+                    <td class="py-4 text-slate-700">{{ loan.loanDate | date:'dd/MM/yyyy' }}</td>
                     <td class="py-4 text-slate-700">
-                      <span [ngClass]="loan.isOverdue ? 'text-red-600 font-bold' : ''">
-                        {{ loan.dueDate | date:'dd/MM/yyyy' }}
+                      <span [ngClass]="loan.late ? 'text-red-600 font-bold' : ''">
+                        {{ loan.returnDate | date:'dd/MM/yyyy' }}
                       </span>
                     </td>
                     <td class="py-4 text-center">
@@ -77,6 +77,11 @@
                         Valider le retour
                       </button>
                     </td>
+                  </tr>
+                }
+                @empty {
+                  <tr>
+                    <td colspan="5" class="py-8 text-center text-gray-400 italic">Aucun emprunt en cours.</td>
                   </tr>
                 }
               </tbody>
