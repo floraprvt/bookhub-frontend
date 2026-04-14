@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../app/services/auth';
@@ -14,30 +14,31 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  email ='';
-  password ='';
-  errorMessage='';
-  isLoading=false;
+  user = { email: '', password: '' };
+  errorMessage = signal<string | null>(null);
+  isLoading = signal(false);
 
   onSubmit(loginForm: any) {
-   if(!loginForm.valid) return;
+    if (!loginForm.valid) return;
 
-   this.isLoading = true;
-   this.errorMessage='';
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-   this.authService.login(this.email, this.password).subscribe({
+    this.authService.login(this.user.email, this.user.password).subscribe({
       next: () => {
         this.router.navigate(['/profil']);
       },
       error: (err) => {
-        this.isLoading = false;
+        this.isLoading.set(false);
         if (err.status === 401) {
-          this.errorMessage = 'Email ou mot de passe incorrect';
+          this.errorMessage.set('Email ou mot de passe incorrect');
+        } else if (err.error && typeof err.error === 'object') {
+          const messages = Object.values(err.error).join(' | ');
+          this.errorMessage.set(messages);
         } else {
-          this.errorMessage = 'Une erreur est survenue, réessayez plus tard';
+          this.errorMessage.set('Une erreur est survenue, réessayez plus tard');
         }
       }
     });
-
   }
 }
