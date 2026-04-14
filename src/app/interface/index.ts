@@ -29,9 +29,9 @@ export interface Book {
     id: number | string;
     title: string;
     isbn?: string;
-    authors: Author[];
+    author: Author[];
     description?: string;
-    categories: Category[];
+    category: Category[];
     image: string;
     date?: Date | string;
     ratings?: Rating[];

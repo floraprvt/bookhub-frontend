@@ -51,8 +51,14 @@
           </button>
         </div>
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          @if(loadError()) {
+            <p class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+              {{ loadError() }}
+            </p>
+          }
+
           <div class="mb-6">
-            <input type="text" [(ngModel)]="searchQuery" placeholder="Rechercher par titre, auteur ou ISBN..." class="w-full md:w-1/2 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#162D3A] outline-none">
+            <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Rechercher par titre, auteur ou ISBN..." class="w-full md:w-1/2 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#162D3A] outline-none">
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left min-w-[800px]">
@@ -66,13 +72,13 @@
                 </tr>
               </thead>
               <tbody>
-                @for(book of books(); track book.id) {
+                @for(book of filteredBooks(); track book.id) {
                   <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
                     <td class="py-4 font-medium text-slate-800">{{ book.title }}</td>
-                    <td class="py-4 text-slate-700">{{ book.author }}</td>
+                    <td class="py-4 text-slate-700">{{ getAuthorsDisplay(book.authors) }}</td>
                     <td class="py-4 text-slate-700">{{ book.isbn }}</td>
                     <td class="py-4">
-                      <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="book.availableCopies > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'">
+                      <span [class]="book.availableCopies > 0 ? 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800' : 'px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800'">
                         {{ book.availableCopies }} / {{ book.totalCopies }}
                       </span>
                     </td>
@@ -90,6 +96,88 @@
             </table>
           </div>
         </div>
+
+        @if(isModalOpen()) {
+          <div
+            class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="catalog-modal-title"
+            (click)="closeModal()"
+            (keydown.escape)="closeModal()"
+          >
+            <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl" (click)="$event.stopPropagation()">
+              <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                <h2 id="catalog-modal-title" class="text-xl font-bold text-slate-800">
+                  {{ modalMode() === 'create' ? 'Ajouter un livre' : 'Modifier un livre' }}
+                </h2>
+                <button type="button" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700" (click)="closeModal()" aria-label="Fermer la fenêtre">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+              </div>
+
+              <form class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2" #bookFormRef="ngForm" (ngSubmit)="saveBook()">
+                <label class="flex flex-col gap-2 md:col-span-2">
+                  <span class="text-sm font-semibold text-slate-700">Titre</span>
+                  <input type="text" name="title" required [(ngModel)]="bookForm.title" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A]">
+                </label>
+
+                <label class="flex flex-col gap-2 md:col-span-2">
+                  <span class="text-sm font-semibold text-slate-700">Auteurs</span>
+                  <select name="selectedAuthorIds" required multiple [(ngModel)]="bookForm.selectedAuthorIds" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A] min-h-28">
+                    @for(author of authors(); track author.id) {
+                      <option [ngValue]="author.id">{{ getAuthorFullName(author) }}</option>
+                    }
+                  </select>
+                  <span class="text-xs text-slate-500">Maintenez Ctrl (ou Cmd sur Mac) pour selectionner plusieurs auteurs.</span>
+                </label>
+
+                <label class="flex flex-col gap-2 md:col-span-2">
+                  <span class="text-sm font-semibold text-slate-700">Categories</span>
+                  <select name="selectedCategoryIds" required multiple [(ngModel)]="bookForm.selectedCategoryIds" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A] min-h-28">
+                    @for(category of categories(); track category.id) {
+                      <option [ngValue]="category.id">{{ category.name }}</option>
+                    }
+                  </select>
+                  <span class="text-xs text-slate-500">Maintenez Ctrl (ou Cmd sur Mac) pour selectionner plusieurs categories.</span>
+                </label>
+
+                <label class="flex flex-col gap-2 md:col-span-2">
+                  <span class="text-sm font-semibold text-slate-700">ISBN</span>
+                  <input type="text" name="isbn" required [(ngModel)]="bookForm.isbn" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A]">
+                </label>
+
+                <label class="flex flex-col gap-2 md:col-span-2">
+                  <span class="text-sm font-semibold text-slate-700">Description</span>
+                  <textarea name="description" rows="3" [(ngModel)]="bookForm.description" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A]"></textarea>
+                </label>
+
+                <label class="flex flex-col gap-2 md:col-span-2">
+                  <span class="text-sm font-semibold text-slate-700">Image (URL)</span>
+                  <input type="url" name="image" [(ngModel)]="bookForm.image" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A]">
+                </label>
+
+                <label class="flex flex-col gap-2 md:col-span-2">
+                  <span class="text-sm font-semibold text-slate-700">Date de publication</span>
+                  <input type="date" name="date" [(ngModel)]="bookForm.date" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A]">
+                </label>
+
+                <div class="mt-2 flex justify-end gap-3 md:col-span-2">
+                  <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-100" (click)="closeModal()">
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    class="rounded-lg bg-[#162D3A] px-4 py-2 font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    [disabled]="isSaving() || bookFormRef.invalid || bookForm.availableCopies > bookForm.totalCopies"
+                  >
+                    {{ isSaving() ? 'En cours...' : (modalMode() === 'create' ? 'Ajouter' : 'Enregistrer') }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        }
       </div>
     </main>
   </div>
