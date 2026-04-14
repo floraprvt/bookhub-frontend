@@ -1,7 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { User } from '../../app/models/user';
 import { AuthService } from '../../app/services/auth';
 
 
@@ -15,27 +14,31 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  user: User = {
-    email: '',
-    password: '',
-  };
+  user = { email: '', password: '' };
+  errorMessage = signal<string | null>(null);
+  isLoading = signal(false);
 
   onSubmit(loginForm: any) {
-    if (loginForm.valid && this.user.email && this.user.password) {
-      // Vérification des identifiants
-      if (
-        this.authService.validateCredentials(
-          this.user.email,
-          this.user.password
-        )
-      ) {
-        this.authService.login(this.user.email, this.user.password);
-        console.log('Connexion réussie');
+    if (!loginForm.valid) return;
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.authService.login(this.user.email, this.user.password).subscribe({
+      next: () => {
         this.router.navigate(['/profil']);
-      } else {
-        console.error('Identifiants incorrects');
-        // Ici vous pourriez afficher un message d'erreur
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        if (err.status === 401) {
+          this.errorMessage.set('Email ou mot de passe incorrect');
+        } else if (err.error && typeof err.error === 'object') {
+          const messages = Object.values(err.error).join(' | ');
+          this.errorMessage.set(messages);
+        } else {
+          this.errorMessage.set('Une erreur est survenue, réessayez plus tard');
+        }
       }
-    }
+    });
   }
 }
