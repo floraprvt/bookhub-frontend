@@ -6,6 +6,7 @@ import { Author, Book, BookCatalog, BookFormData, Category } from '../../app/int
 import { BookService } from '../../app/services/book'
 import { AuthorService } from '../../app/services/author'
 import { CategoryService } from '../../app/services/category'
+import { AuthService } from '../../app/services/auth'
 
 @Component({
   selector: 'app-catalog-management',
@@ -17,6 +18,7 @@ export class CatalogManagement implements OnInit {
   private readonly bookService = inject(BookService)
   private readonly authorService = inject(AuthorService)
   private readonly categoryService = inject(CategoryService)
+  private readonly authService = inject(AuthService)
 
   books = signal<BookCatalog[]>([])
   authors = signal<Author[]>([])
@@ -29,6 +31,8 @@ export class CatalogManagement implements OnInit {
   isSaving = signal<boolean>(false)
   loadError = signal<string>('')
   bookForm: BookFormData = this.createEmptyBookForm()
+
+  isAdmin = this.authService.isAdmin
 
   filteredBooks = computed(() => {
     const query = this.searchQuery().trim().toLowerCase()

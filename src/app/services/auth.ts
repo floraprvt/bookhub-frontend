@@ -19,6 +19,8 @@ export class AuthService {
  
   public isAuthenticated = computed(() => this.currentUserSignal() !== null);
   public currentUser = computed(() => this.currentUserSignal());
+  public isAdmin = computed(() => this.currentUserSignal()?.role === 'ADMIN');
+  public isLibrarian = computed(() => this.currentUserSignal()?.role === 'LIBRARIAN');
  
   constructor() {
     const storedUser = localStorage.getItem('currentUser');
