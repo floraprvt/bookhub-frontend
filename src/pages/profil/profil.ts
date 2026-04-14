@@ -3,13 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../app/services/auth';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { Loan, RoleEnum, User } from '../../app/interface';
+import { ApiLoan, LoanService } from '../../app/services/loan';
+import { BookService } from '../../app/services/book';
 
-export interface UserProfile {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-}
 
 export interface BorrowedBook {
   id: number;
@@ -49,14 +47,20 @@ export interface HistoryBook {
 
 export class Profil implements OnInit {
   private authService = inject(AuthService);
+  private loanService = inject(LoanService);
+  private bookService = inject(BookService);
 
-  user = signal<UserProfile>({
-    firstName: '', lastName: '', email: ''
+  user = signal<User>({
+    firstName: '', 
+    lastName: '', 
+    email: '',
+    id: '',
+    role: RoleEnum.USER
   });
 
-  borrows = signal<BorrowedBook[]>([]);
+  loan = signal<Loan[]>([]);
   reservations = signal<ReservedBook[]>([]);
-  history = signal<HistoryBook[]>([]);
+  history = signal<Loan[]>([]);
   isUpdating = signal(false);
   updateSuccess = signal(false);
   updateError = signal<string | false>(false);
@@ -73,7 +77,7 @@ export class Profil implements OnInit {
 
   ngOnInit() {
     this.loadUserData();
-    this.loadMockBooks();
+    this.loadBooksData();
   }
 
   loadUserData() {
@@ -81,29 +85,69 @@ export class Profil implements OnInit {
 
     if (loggedInUser) {
       this.user.set({
+        id: loggedInUser.id,
         firstName: loggedInUser.firstName || '',
         lastName: loggedInUser.lastName || '',
         email: loggedInUser.email || '',
-        phone: loggedInUser.phone || ''
+        phone: loggedInUser.phone || '',
+        role: loggedInUser.role || RoleEnum.USER
       });
     }
   }
 
-  loadMockBooks() {
-    this.borrows.set([
-      { id: 1, title: "La Nuit des Temps", author: "René Barjavel", coverUrl: "assets/livre.webp", dueDate: new Date('2025-03-03'), isOverdue: true },
-      { id: 2, title: "Dune", author: "Frank Herbert", coverUrl: "assets/livre.webp", dueDate: new Date(new Date().setDate(new Date().getDate() + 5)), isOverdue: false, daysRemaining: 5 }
-    ]);
+  loadBooksData() {
+    forkJoin({
+      myLoansData: this.loanService.getMyLoans(),
+      catalogData: this.bookService.getBooks()
+    }).subscribe({
+      next: ({ myLoansData, catalogData }) => {
+        const allApiLoans = Object.values(myLoansData).flat();
+        const allBooksInCatalog = catalogData.content;
 
-    this.reservations.set([
-      { id: 1, title: "Fondation", author: "Isaac Asimov", coverUrl: "assets/livre.webp", currentRank: 4, totalRank: 5 }
-    ]);
+        const mapToGlobalLoan = (apiLoan: ApiLoan): Loan => {
+          const dueDate = new Date(apiLoan.returnDate);
+          const today = new Date();
+          const daysRemaining = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+          const realBook = allBooksInCatalog.find(b => b.id.toString() === apiLoan.bookId?.toString());
 
-    this.history.set([
-      { id: 1, title: "1984", author: "George Orwell", coverUrl: "assets/livre.webp", returnedDate: new Date('2023-11-16'), rating: 4 },
-      { id: 2, title: "Le Seigneur des Anneaux", author: "J.R.R. Tolkien", coverUrl: "assets/livre.webp", returnedDate: new Date('2022-05-10'), rating: 5 }
-    ]);
-  }
+          console.log(`--- ANALYSE EMPRUNT (Livre ID attendu : ${apiLoan.bookId}) ---`);
+          console.log("1. Livre trouvé dans le catalogue Angular ?", realBook ? "OUI (" + realBook.title + ")" : "NON ❌");
+          if (realBook) {
+            console.log("2. Contenu de la case 'author' de ce livre :", realBook.author);
+          }
+          console.log("---------------------------------------------------");
+
+          return {
+            id: apiLoan.id,
+            loanDate: apiLoan.loanDate,
+            returnDate: apiLoan.returnDate,
+            isReturned: apiLoan.isReturned,
+            late: apiLoan.late,
+            daysRemaining: daysRemaining > 0 ? daysRemaining : 0,
+            user: { id: apiLoan.userId, firstName: '', lastName: '', email: '', role: RoleEnum.USER },
+            book: {
+              id: realBook?.id || 0, 
+              title: apiLoan.bookTitle, 
+              image: realBook?.image || 'assets/livre.webp',
+              author: (realBook?.author && realBook.author.length > 0) 
+                        ? realBook.author 
+                        : [{ id: 0, firstName: 'Auteur', lastName: 'Inconnu' }],
+              category: realBook?.category || [],
+              isAvailable: false
+            }
+          };
+        };
+
+        const activeLoans = allApiLoans.filter(l => !l.isReturned).map(mapToGlobalLoan);
+        const pastLoans = allApiLoans.filter(l => l.isReturned).map(mapToGlobalLoan);
+
+        this.loan.set(activeLoans);
+        this.history.set(pastLoans);
+        this.reservations.set([]);
+      },
+      error: (err) => console.error('Erreur lors du chargement des données:', err)
+    });
+}
 
   updateProfile() {
     const { firstName, lastName, phone } = this.user();
@@ -176,9 +220,9 @@ export class Profil implements OnInit {
     this.reservations.update(res => res.filter(r => r.id !== id));
   }
 
-  rateBook(id: number, rating: number) {
+  rateBook(id: string | number, rating: number) {
     this.history.update(hist =>
-      hist.map(book => book.id === id ? { ...book, rating } : book)
+      hist.map(emprunt => emprunt.id === id ? { ...emprunt, rating } : emprunt)
     );
   }
 

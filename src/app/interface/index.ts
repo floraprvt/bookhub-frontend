@@ -5,13 +5,13 @@ export enum RoleEnum {
 }
 
 export interface User {
-    id: string | number;
+    id?: string | number;
     firstName: string;
     lastName: string;
     email: string;
     password?: string;
     phone?: string;
-    role: RoleEnum;
+    role: RoleEnum | string;
 }
 
 export interface Author {
@@ -42,16 +42,14 @@ export interface Book {
 }
 
 export interface Loan {
-    id: number;
-    loanDate: string;
-    returnDate: string;
+    id: number | string;
+    loanDate: Date | string;
+    returnDate: Date | string;
     isReturned: boolean;
-    userId: number;
-    bookId: number;
-    firstName: string;
-    lastName: string;
-    bookTitle: string;
-    late: boolean;
+    user: User;
+    book: Book;
+    late?: boolean; 
+    daysRemaining?: number; 
 }
 
 export interface Rating{
