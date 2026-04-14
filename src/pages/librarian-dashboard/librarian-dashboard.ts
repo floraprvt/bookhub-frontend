@@ -1,31 +1,33 @@
-import { Component, signal, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
+import { Component, signal, OnInit, AfterViewInit, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { RouterLink, RouterLinkActive } from '@angular/router'
+import { RouterLink } from '@angular/router'
+import { HttpClient } from '@angular/common/http'
 import { Chart, registerables } from 'chart.js'
 
 Chart.register(...registerables)
 
+const API_URL = 'http://localhost:8080'
+
 export interface DashboardStats {
   totalBooks: number
-  activeBorrows: number
-  currentOverdues: number
+  activeLoans: number
+  overdueLoans: number
 }
 
 export interface OverdueRecord {
-  id: string
-  memberName: string
+  loanId: number
+  userId: number
+  userFirstName: string
+  userLastName: string
   bookTitle: string
-  dueDate: Date
+  returnDate: string
   daysOverdue: number
 }
 
 export interface TopBook {
-  id: string
-  rank: number
+  bookId: number
   title: string
-  author: string
-  borrowCount: number
-  coverUrl: string
+  loanCount: number
 }
 
 @Component({
@@ -35,16 +37,9 @@ export interface TopBook {
   templateUrl: './librarian-dashboard.html'
 })
 export class LibrarianDashboard implements OnInit, AfterViewInit {
-  @ViewChild('borrowChart') borrowChart!: ElementRef
+  private readonly http = inject(HttpClient)
 
-  librarianName = signal<string>('Ahmed')
-
-  stats = signal<DashboardStats>({
-    totalBooks: 0,
-    activeBorrows: 0,
-    currentOverdues: 0
-  })
-
+  stats = signal<DashboardStats>({ totalBooks: 0, activeLoans: 0, overdueLoans: 0 })
   overdues = signal<OverdueRecord[]>([])
   topBooks = signal<TopBook[]>([])
 
@@ -53,8 +48,7 @@ export class LibrarianDashboard implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    const canvas = document.getElementById('borrowChart') as HTMLCanvasElement;
-
+    const canvas = document.getElementById('borrowChart') as HTMLCanvasElement
     if (canvas) {
       new Chart(canvas, {
         type: 'line',
@@ -72,64 +66,32 @@ export class LibrarianDashboard implements OnInit, AfterViewInit {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
         }
-      });
+      })
     }
   }
 
   loadData() {
-    this.stats.set({
-      totalBooks: 2000,
-      activeBorrows: 285,
-      currentOverdues: 18
+    this.http.get<DashboardStats>(`${API_URL}/api/loans/stats`).subscribe({
+      next: (data) => this.stats.set(data)
     })
 
-    this.overdues.set([
-      {
-        id: '1',
-        memberName: 'Jean Dupont',
-        bookTitle: 'La Peste',
-        dueDate: new Date('2026-01-01'),
-        daysOverdue: 7
-      },
-      {
-        id: '2',
-        memberName: 'Marie Curie',
-        bookTitle: 'L\'Étranger',
-        dueDate: new Date('2026-01-05'),
-        daysOverdue: 3
-      }
-    ])
+    this.http.get<OverdueRecord[]>(`${API_URL}/api/loans/overdue`).subscribe({
+      next: (data) => this.overdues.set(data)
+    })
 
-    this.topBooks.set([
-      { id: '1', rank: 1, title: 'Le Petit Prince', author: '1984', borrowCount: 120, coverUrl: 'assets/arsene.webp' },
-      { id: '2', rank: 2, title: 'Astérix', author: 'Astérix', borrowCount: 60, coverUrl: 'assets/arsene.webp' },
-      { id: '3', rank: 3, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.webp' },
-      { id: '4', rank: 4, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.webp' },
-      { id: '5', rank: 5, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.webp' },
-      { id: '6', rank: 6, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.webp' },
-      { id: '7', rank: 7, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.webp' },
-      { id: '8', rank: 8, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.webp' },
-      { id: '9', rank: 9, title: 'La Peste', author: 'Jean Dupont', borrowCount: 50, coverUrl: 'assets/arsene.webp' },
-      { id: '10', rank: 10, title: 'Le poulier', author: 'Auteur Vislan', borrowCount: 47, coverUrl: 'assets/arsene.webp' },
-    ])
+    this.http.get<TopBook[]>(`${API_URL}/api/loans/top10`).subscribe({
+      next: (data) => this.topBooks.set(data)
+    })
   }
 
-  relancer(id: string) {
-    alert(`Relance envoyée pour le dossier ${id}`)
+  relancer(loanId: number) {
+    alert(`Relance envoyée pour l'emprunt #${loanId}`)
   }
 
-  gererRetour(id: string) {
-    alert(`Gestion du retour validée pour le dossier ${id}`)
+  gererRetour(loanId: number) {
+    alert(`Retour validé pour l'emprunt #${loanId}`)
   }
 }
