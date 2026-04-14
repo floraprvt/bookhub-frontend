@@ -72,7 +72,8 @@ export class Profil implements OnInit {
       this.user.set({
         firstName: loggedInUser.firstName || '',
         lastName: loggedInUser.lastName || '',
-        email: loggedInUser.email || ''
+        email: loggedInUser.email || '',
+        phone: loggedInUser.phone || ''
       });
     }
   }

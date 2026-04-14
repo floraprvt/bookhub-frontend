@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { Registered, User } from '../models/user';
  
 const API_URL = 'http://localhost:8080';
@@ -33,16 +33,20 @@ export class AuthService {
     }
   }
  
-  login(email: string, password: string): Observable<LoginResponse> {
+  login(email: string, password: string): Observable<Partial<User>> {
     return this.http.post<LoginResponse>(`${API_URL}/api/auth/login`, { email, password }).pipe(
       tap((response) => {
-        const userToStore: Partial<User> = {
-          email,
-          token: response.token,
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userToStore));
-        this.currentUserSignal.set(userToStore);
-      })
+        localStorage.setItem('currentUser', JSON.stringify({ token: response.token }));
+      }),
+      switchMap((response) =>
+        this.http.get<Partial<User>>(`${API_URL}/api/users/me`).pipe(
+          tap((user) => {
+            const userToStore: Partial<User> = { ...user, token: response.token };
+            localStorage.setItem('currentUser', JSON.stringify(userToStore));
+            this.currentUserSignal.set(userToStore);
+          })
+        )
+      )
     );
   }
  
