@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Book } from '../interface';
+import { Book, BookSearchParams } from '../interface';
 
 const API_URL = 'http://localhost:8080';
 const BOOK_ENDPOINT = '/api/books'
@@ -23,9 +23,39 @@ export class BookService {
     return this.http.get<Book>(`${API_URL}${BOOK_ENDPOINT}/${id}`);
   }
 
-  // GET ${BOOK_ENDPOINT}/search
-  searchBooks(title: string, categoryList: number[], authors: number[], date: string, isAvailable: boolean, isbn: string) {
-    return this.http.get<BooksResponse>(`${API_URL}${BOOK_ENDPOINT}/search?title=${title}`);
+  searchBooks(search: BookSearchParams) {
+    let params = new HttpParams();
+
+    if (search.title?.trim()) {
+      const normalizedTitle = search.title.trim().replace(/%/g, '');
+      params = params.set('title', `%${normalizedTitle}%`);
+    }
+
+    if (search.categoryList?.length) {
+      for (const categoryId of search.categoryList) {
+        params = params.append('categoryList', String(categoryId));
+      }
+    }
+
+    if (search.authors?.length) {
+      for (const authorId of search.authors) {
+        params = params.append('authors', String(authorId));
+      }
+    }
+
+    if (search.date?.trim()) {
+      params = params.set('date', search.date.trim());
+    }
+
+    if (search.isAvailable !== undefined) {
+      params = params.set('isAvailable', String(search.isAvailable));
+    }
+
+    if (search.isbn?.trim()) {
+      params = params.set('isbn', search.isbn.trim());
+    }
+
+    return this.http.get<BooksResponse>(`${API_URL}${BOOK_ENDPOINT}/search`, { params });
   }
 
   addBook(book: Partial<Book>) {

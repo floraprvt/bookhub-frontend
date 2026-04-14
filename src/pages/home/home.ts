@@ -1,4 +1,4 @@
-import { Component, computed, signal, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BookService } from '../../app/services/book';
 import { ProductCardComponent } from '../../app/components/cards/cards';
@@ -7,9 +7,9 @@ import { Book } from '../../app/interface';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
   imports: [ProductCardComponent],
   templateUrl: './home.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home implements OnInit {
   private router = inject(Router)
@@ -17,6 +17,7 @@ export class Home implements OnInit {
   private bookService = inject(BookService)
 
   products = signal<Book[]>([])
+  searchTerm = signal<string>('')
 
   selectedCategory = signal<string>('all')
   currentPage = signal<number>(1)
@@ -47,10 +48,36 @@ export class Home implements OnInit {
       this.selectedCategory.set(urlSegment)
     }
 
+    this.loadAllBooks()
+  }
+
+  private loadAllBooks() {
     this.bookService.getBooks().subscribe({
-        next: ((value) => this.products.set(value.content)),
-        error: ((error: any) => console.log(error))
-      })
+      next: value => this.products.set(value.content),
+      error: (error: unknown) => console.error(error)
+    })
+  }
+
+  onSearchInput(value: string) {
+    this.searchTerm.set(value)
+  }
+
+  onSearch() {
+    const title = this.searchTerm().trim()
+
+    if (!title) {
+      this.currentPage.set(1)
+      this.loadAllBooks()
+      return
+    }
+
+    this.bookService.searchBooks({ title }).subscribe({
+      next: value => {
+        this.products.set(value.content)
+        this.currentPage.set(1)
+      },
+      error: (error: unknown) => console.error(error)
+    })
   }
 
   onCategoryChange(category: string) {

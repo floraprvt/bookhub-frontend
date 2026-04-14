@@ -66,6 +66,15 @@ export interface BookFormData {
   isAvailable: boolean
 }
 
+export interface BookSearchParams {
+  title?: string;
+  categoryList?: number[];
+  authors?: number[];
+  date?: string;
+  isAvailable?: boolean;
+  isbn?: string;
+}
+
 export interface Loan {
     id: number;
     loanDate: string;
