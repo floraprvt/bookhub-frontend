@@ -4,7 +4,7 @@ import { Book } from '../interface';
 
 const API_URL = 'http://localhost:8080';
 
-interface BookResponse {
+interface BooksResponse {
   content: Book[];
 }
 
@@ -15,6 +15,10 @@ export class BookService {
   private readonly http = inject(HttpClient);
 
   getBooks() {
-    return this.http.get<BookResponse>(`${API_URL}/api/books`);
+    return this.http.get<BooksResponse>(`${API_URL}/api/books`);
+  }
+
+  getBookById(id: number) {
+    return this.http.get<Book>(`${API_URL}/api/books/${id}`);
   }
 }
