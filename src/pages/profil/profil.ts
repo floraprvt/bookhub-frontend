@@ -57,6 +57,9 @@ export class Profil implements OnInit {
   borrows = signal<BorrowedBook[]>([]);
   reservations = signal<ReservedBook[]>([]);
   history = signal<HistoryBook[]>([]);
+  isUpdating = signal(false);
+  updateSuccess = signal(false);
+  updateError = signal<string | false>(false);
 
   starsArray = [1, 2, 3, 4, 5];
 
@@ -95,19 +98,32 @@ export class Profil implements OnInit {
   }
 
   updateProfile() {
-    const currentUserInfo = this.authService.currentUser();
+    const { firstName, lastName, phone } = this.user();
+    this.isUpdating.set(true);
+    this.updateSuccess.set(false);
+    this.updateError.set(false);
 
-    if (currentUserInfo) {
-      const updatedUser = {
-        ...currentUserInfo,
-        ...this.user()
-      };
-
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-
-    }
-
-    alert("Vos informations ont été mises à jour !");
+    this.authService.updateProfile({ firstName, lastName, phone: phone || '' }).subscribe({
+      next: () => {
+        this.isUpdating.set(false);
+        this.updateSuccess.set(true);
+      },
+      error: (err) => {
+        this.isUpdating.set(false);
+        const fieldLabels: Record<string, string> = {
+          firstName: 'Prénom',
+          lastName: 'Nom',
+          phone: 'Téléphone',
+        };
+        this.updateError.set(
+          err.error && typeof err.error === 'object'
+            ? Object.entries(err.error)
+                .map(([key, msg]) => `${fieldLabels[key] ?? key} : ${msg}`)
+                .join(' | ')
+            : 'Une erreur est survenue, réessayez.'
+        );
+      }
+    });
   }
 
   deleteAccount() {

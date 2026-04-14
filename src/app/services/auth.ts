@@ -50,6 +50,16 @@ export class AuthService {
     );
   }
  
+  updateProfile(data: { firstName: string; lastName: string; phone: string }): Observable<Partial<User>> {
+    return this.http.put<Partial<User>>(`${API_URL}/api/users/me`, data).pipe(
+      tap((updatedUser) => {
+        const userToStore = { ...this.currentUserSignal(), ...updatedUser };
+        localStorage.setItem('currentUser', JSON.stringify(userToStore));
+        this.currentUserSignal.set(userToStore);
+      })
+    );
+  }
+
   logout(): void {
     localStorage.removeItem('currentUser');
     this.currentUserSignal.set(null);
