@@ -2,7 +2,10 @@ import { Component, signal, OnInit, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { RoleEnum, User } from '../../interface';
+import { HttpClient } from '@angular/common/http'
+import { User } from '../../interface';
+
+const API_URL = 'http://localhost:8080';
 
 @Component({
   selector: 'app-edit-user',
@@ -11,43 +14,35 @@ import { RoleEnum, User } from '../../interface';
   templateUrl: './edit-user.html'
 })
 export class EditUser implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
 
-  // Signal pour stocker l'utilisateur en cours d'édition
   user = signal<User | null>(null);
-
-  // Les rôles définis dans le cahier des charges
+  selectedRole = '';
   availableRoles = ['USER', 'LIBRARIAN', 'ADMIN'];
+  errorMessage = '';
 
   ngOnInit() {
-    // 1. Récupérer l'ID depuis l'URL
     const userId = this.route.snapshot.paramMap.get('id');
-    
     if (userId) {
-      this.loadUser(userId);
+      this.http.get<User>(`${API_URL}/api/users/${userId}`).subscribe({
+        next: (user) => {
+          this.user.set(user);
+          this.selectedRole = user.role as string;
+        }
+      });
     }
   }
 
-  loadUser(id: string) {
-    // 2. Simulation de récupération en BDD (A remplacer par ton Service plus tard)
-    // Ici on simule qu'on a trouvé l'utilisateur correspondant à l'ID
-    this.user.set({
-      id: id,
-      firstName: 'Jean',
-      lastName: 'Dupont',
-      email: 'jean.dupont@email.com',
-      phone: '06 12 34 56 78',
-      role: RoleEnum.USER
-    });
-  }
-
   saveChanges() {
-    console.log("Nouvelles données sauvegardées :", this.user());
-    alert('Rôle mis à jour avec succès !');
-    
-    // 3. Retourner à la liste des administrateurs
-    this.router.navigate(['/admin']);
+    const user = this.user();
+    if (!user) return;
+
+    this.http.put(`${API_URL}/api/users/${user.id}/role`, { role: this.selectedRole }).subscribe({
+      next: () => this.router.navigate(['/admin']),
+      error: (err) => this.errorMessage = err.error?.message ?? 'Une erreur est survenue.'
+    });
   }
 
   cancel() {
