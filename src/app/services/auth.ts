@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { Registered, User } from '../models/user';
  
 const API_URL = 'http://localhost:8080';
@@ -33,19 +33,46 @@ export class AuthService {
     }
   }
  
-  login(email: string, password: string): Observable<LoginResponse> {
+  login(email: string, password: string): Observable<Partial<User>> {
     return this.http.post<LoginResponse>(`${API_URL}/api/auth/login`, { email, password }).pipe(
       tap((response) => {
-        const userToStore: Partial<User> = {
-          email,
-          token: response.token,
-        };
+        localStorage.setItem('currentUser', JSON.stringify({ token: response.token }));
+      }),
+      switchMap((response) =>
+        this.http.get<Partial<User>>(`${API_URL}/api/users/me`).pipe(
+          tap((user) => {
+            const userToStore: Partial<User> = { ...user, token: response.token };
+            localStorage.setItem('currentUser', JSON.stringify(userToStore));
+            this.currentUserSignal.set(userToStore);
+          })
+        )
+      )
+    );
+  }
+ 
+  updateProfile(data: { firstName: string; lastName: string; phone: string }): Observable<Partial<User>> {
+    return this.http.put<Partial<User>>(`${API_URL}/api/users/me`, data).pipe(
+      tap((updatedUser) => {
+        const userToStore = { ...this.currentUserSignal(), ...updatedUser };
         localStorage.setItem('currentUser', JSON.stringify(userToStore));
         this.currentUserSignal.set(userToStore);
       })
     );
   }
- 
+
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http.put<void>(`${API_URL}/api/users/me/password`, { currentPassword, newPassword });
+  }
+
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/api/users/me`).pipe(
+      tap(() => {
+        localStorage.removeItem('currentUser');
+        this.currentUserSignal.set(null);
+      })
+    );
+  }
+
   logout(): void {
     localStorage.removeItem('currentUser');
     this.currentUserSignal.set(null);
