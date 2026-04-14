@@ -27,7 +27,7 @@ export class Home implements OnInit {
       return this.products()
     }
     return this.products().filter(p => 
-      p.categories.some(c => c.name === category)
+      p.category.some(c => c.name === category)
     )
   })
 

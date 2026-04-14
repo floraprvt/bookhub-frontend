@@ -1,7 +1,8 @@
 import { Component, signal, OnInit, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Book, RoleEnum } from '../../interface'
+import { Book } from '../../interface'
+import { BookService } from '../../services/book'
 
 @Component({
   selector: 'app-detail-book',
@@ -12,49 +13,54 @@ import { Book, RoleEnum } from '../../interface'
 export class DetailBook implements OnInit {
   private route = inject(ActivatedRoute)
   private router = inject(Router)
+  private bookService = inject(BookService)
   
   book = signal<Book | null>(null)
   starsArray = [1, 2, 3, 4, 5]
 
   ngOnInit() {
-    const bookId = this.route.snapshot.paramMap.get('id')
+    const bookParamId = this.route.snapshot.paramMap.get('id')
     
-    if (bookId) {
-      this.loadBook(bookId)
+    if (bookParamId) {
+      const bookId = Number(bookParamId)
+      this.bookService.getBookById(bookId).subscribe({
+        next: ((value) => this.book.set(value)),
+        error: ((error: any) => console.log(error))
+      })
     }
   }
 
-  loadBook(id: string) {
-    this.book.set({
-      id: id,
-      authors: [{ id: 1, firstName: 'Gaston', lastName: 'Leroux' }],
-      categories: [{ id:1, name: 'Roman Policier'}],
-      isbn: '978-2253005490',
-      title: 'Le Mystère de la chambre jaune',
-      description: 'Le jeune reporter Joseph Rouletabille, accompagné de son ami Sainclair, se rend au château du Glandier pour éclaircir une tentative d\'assassinat. Mathilde Stangerson, la fille du célèbre professeur, a été retrouvée gravement blessée dans une chambre fermée de l\'intérieur...',
-      image: 'assets/arsene.jpg',
-      date: '1907-09-01',
-      isAvailable: true,
-      availableCopies: 2,
-      totalCopies: 3,
-      ratings: [
-        {
-          id: 1,
-          date: new Date('2026-01-10'),
-          score: 5,
-          comment: 'Un chef d\'œuvre de la littérature policière !',
-          user: { id: 101, firstName: 'Marie', lastName: 'Curie', email: 'm@curie.com', role: 'USER' as RoleEnum }
-        },
-        {
-          id: 2,
-          date: new Date('2026-01-12'),
-          score: 4,
-          comment: 'Très bon livre, même si le début est un peu lent.',
-          user: { id: 102, firstName: 'Jean', lastName: 'Dupont', email: 'j@dupont.com', role: 'USER' as RoleEnum }
-        }
-      ]
-    })
-  }
+  // loadBook(id: string) {
+  //   this.book.set({
+  //     id: id,
+  //     authors: [{ id: 1, firstName: 'Gaston', lastName: 'Leroux' }],
+  //     categories: [{ id:1, name: 'Roman Policier'}],
+  //     isbn: '978-2253005490',
+  //     title: 'Le Mystère de la chambre jaune',
+  //     description: 'Le jeune reporter Joseph Rouletabille, accompagné de son ami Sainclair, se rend au château du Glandier pour éclaircir une tentative d\'assassinat. Mathilde Stangerson, la fille du célèbre professeur, a été retrouvée gravement blessée dans une chambre fermée de l\'intérieur...',
+  //     image: 'assets/arsene.jpg',
+  //     date: '1907-09-01',
+  //     isAvailable: true,
+  //     availableCopies: 2,
+  //     totalCopies: 3,
+  //     ratings: [
+  //       {
+  //         id: 1,
+  //         date: new Date('2026-01-10'),
+  //         score: 5,
+  //         comment: 'Un chef d\'œuvre de la littérature policière !',
+  //         user: { id: 101, firstName: 'Marie', lastName: 'Curie', email: 'm@curie.com', role: 'USER' as RoleEnum }
+  //       },
+  //       {
+  //         id: 2,
+  //         date: new Date('2026-01-12'),
+  //         score: 4,
+  //         comment: 'Très bon livre, même si le début est un peu lent.',
+  //         user: { id: 102, firstName: 'Jean', lastName: 'Dupont', email: 'j@dupont.com', role: 'USER' as RoleEnum }
+  //       }
+  //     ]
+  //   })
+  // }
 
   getAverageRating(ratings?: any[]): number {
     if (!ratings || ratings.length === 0) return 0;
