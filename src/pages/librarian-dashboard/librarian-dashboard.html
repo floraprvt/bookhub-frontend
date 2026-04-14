@@ -112,7 +112,7 @@
             @for(book of topBooks(); track book.id) {
               <div class="flex items-center gap-4">
                 <span class="font-bold text-xl text-slate-800 w-6">{{ book.rank }}.</span>
-                <img [src]="book.coverUrl" alt="Couverture" class="w-12 h-16 object-cover rounded shadow-sm bg-gray-200">
+                <img [src]="book.coverUrl" alt="Couverture" class="w-12 h-16 object-cover rounded shadow-sm bg-gray-200" loading="lazy">
                 <div class="flex flex-col">
                   <span class="font-bold text-slate-800 text-sm truncate w-32" [title]="book.title">{{ book.title }}</span>
                   <span class="text-xs text-gray-500">{{ book.author }}</span>
