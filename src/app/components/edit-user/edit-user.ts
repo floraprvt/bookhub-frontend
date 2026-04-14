@@ -2,15 +2,7 @@ import { Component, signal, OnInit, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-
-export interface UserToEdit {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  role: string;
-}
+import { RoleEnum, User } from '../../interface';
 
 @Component({
   selector: 'app-edit-user',
@@ -23,7 +15,7 @@ export class EditUser implements OnInit {
   private router = inject(Router);
 
   // Signal pour stocker l'utilisateur en cours d'édition
-  user = signal<UserToEdit | null>(null);
+  user = signal<User | null>(null);
 
   // Les rôles définis dans le cahier des charges
   availableRoles = ['USER', 'LIBRARIAN', 'ADMIN'];
@@ -46,7 +38,7 @@ export class EditUser implements OnInit {
       lastName: 'Dupont',
       email: 'jean.dupont@email.com',
       phone: '06 12 34 56 78',
-      role: 'USER'
+      role: RoleEnum.USER
     });
   }
 
