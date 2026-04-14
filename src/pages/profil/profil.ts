@@ -8,7 +8,7 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phone?: string;
 }
 
 export interface BorrowedBook {
@@ -51,7 +51,7 @@ export class Profil implements OnInit {
   private authService = inject(AuthService);
 
   user = signal<UserProfile>({
-    firstName: '', lastName: '', email: '', phone: ''
+    firstName: '', lastName: '', email: ''
   });
 
   borrows = signal<BorrowedBook[]>([]);
@@ -72,8 +72,7 @@ export class Profil implements OnInit {
       this.user.set({
         firstName: loggedInUser.firstName || '',
         lastName: loggedInUser.lastName || '',
-        email: loggedInUser.email || '',
-        phone: loggedInUser.phone || ''
+        email: loggedInUser.email || ''
       });
     }
   }

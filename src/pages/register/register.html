@@ -1,250 +1,128 @@
 <div class="lg:flex lg:flex-row-reverse p-8 justify-center lg:h-screen">
-	<img src="assets/livre.jpeg" alt="Vieux livre poussiéreux" class="rounded-2xl w-full h-40 md:h-60 lg:w-1/2 lg:h-full">
-	<div class="lg:w-1/2 lg:flex justify-center relative">
-		<div class="lg:flex lg:justify-center flex-col">
-			<h1 class="text-3xl font-semibold mt-4">Bienvenue</h1>
-			<p class="text-gray-500 mt-2 lg:w-96">Aujourd’hui est une nouvelle journée. C’est votre journée. Prenez le temps et lisez</p>
-			<div class="mt-4">
-				<form
-					#registerForm="ngForm"
-					(ngSubmit)="onSubmit(registerForm)"
-					class="space-y-6"
-				>
-					<div>
-						<label for="email" class="block text-sm font-medium text-gray-700">
-							Email
-						</label>
-						<div class="mt-1">
-							<input
-								id="email"
-								name="email"
-								type="email"
-								[(ngModel)]="user.email"
-								required
-								placeholder="Example@email.com"
-								class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
-								[class.border-red-500]="
-								registerForm.controls['email']?.invalid &&
-								registerForm.controls['email']?.touched
-								"
-							/>
-						</div>
-						@if(registerForm.controls['email']?.invalid &&
-						registerForm.controls['email']?.touched) {
-							<p class="mt-2 text-sm text-red-600">
-								L'email est requis
-							</p>
-						}
-					</div>
-          <div>
-						<label for="lastName" class="block text-sm font-medium text-gray-700">
-							Nom
-						</label>
-						<div class="mt-1">
-							<input
-								id="lastName"
-								name="lastName"
-								type="text"
-								[(ngModel)]="user.lastName"
-								required
-								placeholder="Montassier"
-								class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
-								[class.border-red-500]="
-								registerForm.controls['lastName']?.invalid &&
-								registerForm.controls['lastName']?.touched
-								"
-							/>
-						</div>
-						@if(registerForm.controls['lastName']?.invalid &&
-						registerForm.controls['lastName']?.touched) {
-							<p class="mt-2 text-sm text-red-600">
-								Le nom est requis
-							</p>
-						}
-					</div>
-          <div>
-						<label for="firstName" class="block text-sm font-medium text-gray-700">
-							Prénom
-						</label>
-						<div class="mt-1">
-							<input
-								id="firstName"
-								name="firstName"
-								type="text"
-								[(ngModel)]="user.firstName"
-								required
-								placeholder="Romain"
-								class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
-								[class.border-red-500]="
-								registerForm.controls['firstName']?.invalid &&
-								registerForm.controls['firstName']?.touched
-								"
-							/>
-						</div>
-						@if(registerForm.controls['firstName']?.invalid &&
-						registerForm.controls['firstName']?.touched) {
-							<p class="mt-2 text-sm text-red-600">
-								Le prénom est requis
-							</p>
-						}
-					</div>
-          <div>
-						<label for="phone" class="block text-sm font-medium text-gray-700">
-							Numéro de téléphone
-						</label>
-						<div class="mt-1">
-							<input
-								id="phone"
-								name="phone"
-								type="text"
-								[(ngModel)]="user.phone"
-								required
-								placeholder="06000000"
-								class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
-								[class.border-red-500]="
-								registerForm.controls['phone']?.invalid &&
-								registerForm.controls['phone']?.touched
-								"
-							/>
-						</div>
-						@if(registerForm.controls['phone']?.invalid &&
-						registerForm.controls['phone']?.touched) {
-							<p class="mt-2 text-sm text-red-600">
-								Le numéro de téléphone est requis
-							</p>
-						}
-					</div>
-					<div>
-						<label for="password" class="block text-sm font-medium text-gray-700">
-							Mot de passe
-						</label>
-						<div class="mt-1">
-							<input
-								id="password"
-								name="password"
-								type="password"
-								[(ngModel)]="user.password"
-								required
-								class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
-								[class.border-red-500]="
-								registerForm.controls['password']?.invalid &&
-								registerForm.controls['password']?.touched
-								"
-							/>
-						</div>
-						@if(registerForm.controls['password']?.invalid &&
-						registerForm.controls['password']?.touched) {
-							<p class="mt-2 text-sm text-red-600">
-								Le mot de passe est requis
-							</p>
-						}
-					</div>
-          <button
-            type="submit"
-            [disabled]="registerForm.invalid"
-            class="w-full cursor-pointer py-3 rounded-xl text-white bg-[#162D3A] hover:bg-blue-950 transition-colors"
-          >
-            S'inscrire
-          </button>
-				</form>
-			</div>
-			<div class="h-20 flex items-end text-gray-200 w-full justify-center lg:w-96">© 2026 ALL RIGHTS RESERVED</div>
-		</div>
-	</div>
-</div>
-
-
-
-
-
-<div
-  class="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
->
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-      Créer un nouveau compte
-    </h2>
-  </div>
-
-  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-      <form
-        #registerForm="ngForm"
-        (ngSubmit)="onSubmit(registerForm)"
-        class="space-y-6"
-      >
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
-            Adresse email
-          </label>
-          <div class="mt-1">
-            <input
-              id="email"
-              name="email"
-              type="email"
-              [(ngModel)]="user.email"
-              required
-              email
-              placeholder="Entrez votre adresse email"
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              [class.border-red-500]="
-                registerForm.controls['email']?.invalid &&
-                registerForm.controls['email']?.touched
-              "
-            />
-          </div>
-          @if(registerForm.controls['email']?.invalid &&
-          registerForm.controls['email']?.touched) {
-          <p class="mt-2 text-sm text-red-600">
-            @if(registerForm.controls['email']?.errors?.['required']) {
-            L'adresse email est requise }
-            @if(registerForm.controls['email']?.errors?.['email']) { Veuillez
-            entrer une adresse email valide }
-          </p>
-          }
+    <img src="assets/livre.jpeg" alt="Vieux livre poussiéreux" class="rounded-2xl w-full h-40 md:h-60 lg:w-1/2 lg:h-full">
+    <div class="lg:w-1/2 lg:flex justify-center relative">
+        <div class="lg:flex lg:justify-center flex-col">
+            <h1 class="text-3xl font-semibold mt-4">Bienvenue</h1>
+            <p class="text-gray-500 mt-2 lg:w-96">Aujourd'hui est une nouvelle journée. C'est votre journée. Prenez le temps et lisez</p>
+            <div class="mt-4">
+                <form
+                    #registerForm="ngForm"
+                    (ngSubmit)="onSubmit(registerForm)"
+                    class="space-y-6"
+                >
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">
+                            Email
+                        </label>
+                        <div class="mt-1">
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                [(ngModel)]="user.email"
+                                required
+                                placeholder="Example@email.com"
+                                class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
+                                [class.border-red-500]="registerForm.controls['email']?.invalid && registerForm.controls['email']?.touched"
+                            />
+                        </div>
+                        @if(registerForm.controls['email']?.invalid && registerForm.controls['email']?.touched) {
+                            <p class="mt-2 text-sm text-red-600">L'email est requis</p>
+                        }
+                    </div>
+                    <div>
+                        <label for="lastName" class="block text-sm font-medium text-gray-700">
+                            Nom
+                        </label>
+                        <div class="mt-1">
+                            <input
+                                id="lastName"
+                                name="lastName"
+                                type="text"
+                                [(ngModel)]="user.lastName"
+                                required
+                                placeholder="Montassier"
+                                class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
+                                [class.border-red-500]="registerForm.controls['lastName']?.invalid && registerForm.controls['lastName']?.touched"
+                            />
+                        </div>
+                        @if(registerForm.controls['lastName']?.invalid && registerForm.controls['lastName']?.touched) {
+                            <p class="mt-2 text-sm text-red-600">Le nom est requis</p>
+                        }
+                    </div>
+                    <div>
+                        <label for="firstName" class="block text-sm font-medium text-gray-700">
+                            Prénom
+                        </label>
+                        <div class="mt-1">
+                            <input
+                                id="firstName"
+                                name="firstName"
+                                type="text"
+                                [(ngModel)]="user.firstName"
+                                required
+                                placeholder="Romain"
+                                class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
+                                [class.border-red-500]="registerForm.controls['firstName']?.invalid && registerForm.controls['firstName']?.touched"
+                            />
+                        </div>
+                        @if(registerForm.controls['firstName']?.invalid && registerForm.controls['firstName']?.touched) {
+                            <p class="mt-2 text-sm text-red-600">Le prénom est requis</p>
+                        }
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">
+                            Numéro de téléphone
+                        </label>
+                        <div class="mt-1">
+                            <input
+                                id="phone"
+                                name="phone"
+                                type="text"
+                                [(ngModel)]="user.phone"
+                                required
+                                placeholder="06000000"
+                                class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
+                                [class.border-red-500]="registerForm.controls['phone']?.invalid && registerForm.controls['phone']?.touched"
+                            />
+                        </div>
+                        @if(registerForm.controls['phone']?.invalid && registerForm.controls['phone']?.touched) {
+                            <p class="mt-2 text-sm text-red-600">Le numéro de téléphone est requis</p>
+                        }
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">
+                            Mot de passe
+                        </label>
+                        <div class="mt-1">
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                [(ngModel)]="user.password"
+                                required
+                                class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
+                                [class.border-red-500]="registerForm.controls['password']?.invalid && registerForm.controls['password']?.touched"
+                            />
+                        </div>
+                        @if(registerForm.controls['password']?.invalid && registerForm.controls['password']?.touched) {
+                            <p class="mt-2 text-sm text-red-600">Le mot de passe est requis</p>
+                        }
+                    </div>
+                    @if (errorMessage()) {
+                        <p class="text-sm text-red-600 text-center">{{ errorMessage() }}</p>
+                    }
+                    <button
+                        type="submit"
+                        [disabled]="registerForm.invalid || isLoading()"
+                        class="w-full cursor-pointer py-3 rounded-xl text-white bg-[#162D3A] hover:bg-blue-950 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        {{ isLoading() ? 'Inscription en cours...' : "S'inscrire" }}
+                    </button>
+                </form>
+                <p class="flex justify-center w-full mt-6 lg:mt-10">Déjà un compte ? <a routerLink="/login" class="ml-2 text-blue-600">Connexion</a></p>
+            </div>
+            <div class="h-20 flex items-end text-gray-200 w-full justify-center lg:w-96">© 2026 ALL RIGHTS RESERVED</div>
         </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">
-            Mot de passe
-          </label>
-          <div class="mt-1">
-            <input
-              id="password"
-              name="password"
-              type="password"
-              [(ngModel)]="user.password"
-              required
-              minlength="6"
-              placeholder="Choisissez un mot de passe"
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              [class.border-red-500]="
-                registerForm.controls['password']?.invalid &&
-                registerForm.controls['password']?.touched
-              "
-            />
-          </div>
-          @if(registerForm.controls['password']?.invalid &&
-          registerForm.controls['password']?.touched) {
-          <p class="mt-2 text-sm text-red-600">
-            @if(registerForm.controls['password']?.errors?.['required']) { Le
-            mot de passe est requis }
-            @if(registerForm.controls['password']?.errors?.['minlength']) { Le
-            mot de passe doit contenir au moins 6 caractères }
-          </p>
-          }
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            [disabled]="registerForm.invalid"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            S'inscrire
-          </button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
