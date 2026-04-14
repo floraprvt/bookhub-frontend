@@ -51,12 +51,12 @@
 
     @for(product of paginatedProducts(); track $index) {
       <app-cards
-        [id]="product.id"
+        [id]="product.id.toString()"
         [title]="product.title"
-        [category]="product.category"
-        [autor]="product.autor"
-        [imageSrc]="product.imageSrc"
-        [alt]="product.alt"
+        [categories]="product.categories"
+        [authors]="product.authors"
+        [imageSrc]="product.image"
+        alt="Couverture du livre"
         [isAvailable]="product.isAvailable" 
       />
     }

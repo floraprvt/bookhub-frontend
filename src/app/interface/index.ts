@@ -28,16 +28,17 @@ export interface Category {
 export interface Book {
     id: number | string;
     title: string;
-    isbn: string;
+    isbn?: string;
     authors: Author[];
-    description: string;
+    description?: string;
     categories: Category[];
     image: string;
-    date: Date | string;
+    date?: Date | string;
     ratings?: Rating[];
     isAvailable: boolean;
-    availableCopies: number;
-    totalCopies: number;
+    availableCopies?: number;
+    totalCopies?: number;
+    alt?: string;
 }
 
 export interface Loan {
