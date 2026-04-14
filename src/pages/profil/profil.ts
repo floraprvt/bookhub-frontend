@@ -61,6 +61,14 @@ export class Profil implements OnInit {
   updateSuccess = signal(false);
   updateError = signal<string | false>(false);
 
+  showPasswordForm = signal(false);
+  currentPassword = '';
+  newPassword = '';
+  confirmPassword = '';
+  isChangingPassword = signal(false);
+  passwordSuccess = signal(false);
+  passwordError = signal<string | false>(false);
+
   starsArray = [1, 2, 3, 4, 5];
 
   ngOnInit() {
@@ -121,6 +129,35 @@ export class Profil implements OnInit {
                 .map(([key, msg]) => `${fieldLabels[key] ?? key} : ${msg}`)
                 .join(' | ')
             : 'Une erreur est survenue, réessayez.'
+        );
+      }
+    });
+  }
+
+  changePassword() {
+    if (this.newPassword !== this.confirmPassword) {
+      this.passwordError.set('Les mots de passe ne correspondent pas.');
+      return;
+    }
+
+    this.isChangingPassword.set(true);
+    this.passwordSuccess.set(false);
+    this.passwordError.set(false);
+
+    this.authService.changePassword(this.currentPassword, this.newPassword).subscribe({
+      next: () => {
+        this.isChangingPassword.set(false);
+        this.passwordSuccess.set(true);
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmPassword = '';
+      },
+      error: (err) => {
+        this.isChangingPassword.set(false);
+        this.passwordError.set(
+          err.error && typeof err.error === 'object'
+            ? Object.values(err.error).join(' | ')
+            : err.error?.message ?? 'Une erreur est survenue, réessayez.'
         );
       }
     });
