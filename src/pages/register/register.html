@@ -80,15 +80,10 @@
                                 name="phone"
                                 type="text"
                                 [(ngModel)]="user.phone"
-                                required
                                 placeholder="06000000"
                                 class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
-                                [class.border-red-500]="registerForm.controls['phone']?.invalid && registerForm.controls['phone']?.touched"
                             />
                         </div>
-                        @if(registerForm.controls['phone']?.invalid && registerForm.controls['phone']?.touched) {
-                            <p class="mt-2 text-sm text-red-600">Le numéro de téléphone est requis</p>
-                        }
                     </div>
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">
@@ -100,14 +95,9 @@
                                 name="password"
                                 type="password"
                                 [(ngModel)]="user.password"
-                                required
                                 class="appearance-none block w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded-md placeholder-gray-400 focus:outline-none"
-                                [class.border-red-500]="registerForm.controls['password']?.invalid && registerForm.controls['password']?.touched"
                             />
                         </div>
-                        @if(registerForm.controls['password']?.invalid && registerForm.controls['password']?.touched) {
-                            <p class="mt-2 text-sm text-red-600">Le mot de passe est requis</p>
-                        }
                     </div>
                     @if (errorMessage()) {
                         <p class="text-sm text-red-600 text-center">{{ errorMessage() }}</p>
