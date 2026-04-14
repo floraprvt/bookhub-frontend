@@ -79,17 +79,17 @@ export class Profil implements OnInit {
 
   loadMockBooks() {
     this.borrows.set([
-      { id: 1, title: "La Nuit des Temps", author: "René Barjavel", coverUrl: "assets/livre.jpeg", dueDate: new Date('2025-03-03'), isOverdue: true },
-      { id: 2, title: "Dune", author: "Frank Herbert", coverUrl: "assets/livre.jpeg", dueDate: new Date(new Date().setDate(new Date().getDate() + 5)), isOverdue: false, daysRemaining: 5 }
+      { id: 1, title: "La Nuit des Temps", author: "René Barjavel", coverUrl: "assets/livre.webp", dueDate: new Date('2025-03-03'), isOverdue: true },
+      { id: 2, title: "Dune", author: "Frank Herbert", coverUrl: "assets/livre.webp", dueDate: new Date(new Date().setDate(new Date().getDate() + 5)), isOverdue: false, daysRemaining: 5 }
     ]);
 
     this.reservations.set([
-      { id: 1, title: "Fondation", author: "Isaac Asimov", coverUrl: "assets/livre.jpeg", currentRank: 4, totalRank: 5 }
+      { id: 1, title: "Fondation", author: "Isaac Asimov", coverUrl: "assets/livre.webp", currentRank: 4, totalRank: 5 }
     ]);
 
     this.history.set([
-      { id: 1, title: "1984", author: "George Orwell", coverUrl: "assets/livre.jpeg", returnedDate: new Date('2023-11-16'), rating: 4 },
-      { id: 2, title: "Le Seigneur des Anneaux", author: "J.R.R. Tolkien", coverUrl: "assets/livre.jpeg", returnedDate: new Date('2022-05-10'), rating: 5 }
+      { id: 1, title: "1984", author: "George Orwell", coverUrl: "assets/livre.webp", returnedDate: new Date('2023-11-16'), rating: 4 },
+      { id: 2, title: "Le Seigneur des Anneaux", author: "J.R.R. Tolkien", coverUrl: "assets/livre.webp", returnedDate: new Date('2022-05-10'), rating: 5 }
     ]);
   }
 
