@@ -1,14 +1,21 @@
-import { Component, signal, OnInit } from '@angular/core'
+import { Component, signal, OnInit, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { RouterLink, RouterLinkActive } from '@angular/router'
+import { HttpClient } from '@angular/common/http'
 
-export interface ActiveLoan {
-  id: string
-  memberName: string
+const API_URL = 'http://localhost:8080'
+
+export interface Loan {
+  id: number
+  loanDate: string
+  returnDate: string
+  isReturned: boolean
+  userId: number
+  bookId: number
+  firstName: string
+  lastName: string
   bookTitle: string
-  borrowDate: Date
-  dueDate: Date
-  isOverdue: boolean
+  late: boolean
 }
 
 @Component({
@@ -18,18 +25,24 @@ export interface ActiveLoan {
   templateUrl: './returns-management.html'
 })
 export class ReturnsManagement implements OnInit {
-  activeLoans = signal<ActiveLoan[]>([])
-  librarianName = signal<string>('Ahmed')
+  private readonly http = inject(HttpClient)
+
+  activeLoans = signal<Loan[]>([])
 
   ngOnInit() {
-    this.activeLoans.set([
-      { id: 'L1', memberName: 'Jean Dupont', bookTitle: 'La Peste', borrowDate: new Date('2025-12-15'), dueDate: new Date('2026-01-01'), isOverdue: true },
-      { id: 'L2', memberName: 'Marie Curie', bookTitle: 'L\'Étranger', borrowDate: new Date('2026-01-02'), dueDate: new Date('2026-01-16'), isOverdue: false }
-    ])
+    this.loadActiveLoans()
   }
 
-  processReturn(loanId: string) {
-    alert(`Retour enregistré pour l'emprunt ${loanId}. Le nombre d'exemplaires disponibles a été mis à jour.`)
-    this.activeLoans.update(loans => loans.filter(l => l.id !== loanId))
+  loadActiveLoans() {
+    this.http.get<Loan[]>(`${API_URL}/api/loans`).subscribe({
+      next: (loans) => this.activeLoans.set(loans.filter(l => !l.isReturned))
+    })
+  }
+
+  processReturn(loanId: number) {
+    this.http.put<void>(`${API_URL}/api/loans/${loanId}/return`, {}).subscribe({
+      next: () => this.activeLoans.update(loans => loans.filter(l => l.id !== loanId)),
+      error: (err) => alert(err.error?.message ?? 'Une erreur est survenue, réessayez.')
+    })
   }
 }
