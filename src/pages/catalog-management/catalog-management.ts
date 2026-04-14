@@ -177,7 +177,7 @@ export class CatalogManagement implements OnInit {
 
   private loadBooks() {
     this.loadError.set('')
-    this.bookService.getBooks().subscribe({
+    this.bookService.getBooks(0, 500, 'title,asc').subscribe({
       next: (response) => {
         this.books.set(response.content.map(book => this.toCatalogBook(book)))
       },

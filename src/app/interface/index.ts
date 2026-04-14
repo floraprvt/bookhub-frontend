@@ -42,37 +42,48 @@ export interface Book {
 }
 
 export interface BookCatalog {
-  id: string | number
-  title: string
-  authors: string[]
-  authorIds: Array<string | number>
-  categories: string[]
-  categoryIds: Array<string | number>
-  isbn: string
-  description: string
-  image: string
-  date: string
-  isAvailable: boolean
+    id: string | number
+    title: string
+    authors: string[]
+    authorIds: Array<string | number>
+    categories: string[]
+    categoryIds: Array<string | number>
+    isbn: string
+    description: string
+    image: string
+    date: string
+    isAvailable: boolean
 }
 
 export interface BookFormData {
-  title: string
-  selectedAuthorIds: Array<string | number>
-  selectedCategoryIds: Array<string | number>
-  isbn: string
-  description: string
-  image: string
-  date: string
-  isAvailable: boolean
+    title: string
+    selectedAuthorIds: Array<string | number>
+    selectedCategoryIds: Array<string | number>
+    isbn: string
+    description: string
+    image: string
+    date: string
+    isAvailable: boolean
 }
 
 export interface BookSearchParams {
-  title?: string;
-  categoryList?: number[];
-  authors?: number[];
-  date?: string;
-  isAvailable?: boolean;
-  isbn?: string;
+    title?: string;
+    categoryList?: number[];
+    authors?: number[];
+    date?: string;
+    isAvailable?: boolean;
+    isbn?: string;
+    page?: number;
+    size?: number;
+    sort?: string;
+}
+
+export interface BooksPageResponse {
+    content: Book[];
+    totalPages: number;
+    totalElements?: number;
+    number?: number;
+    size?: number;
 }
 
 export interface Loan {
@@ -88,7 +99,7 @@ export interface Loan {
     late: boolean;
 }
 
-export interface Rating{
+export interface Rating {
     id: number | string;
     date: Date | string;
     score: number;

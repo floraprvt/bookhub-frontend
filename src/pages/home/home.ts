@@ -34,16 +34,12 @@ export class Home implements OnInit {
   isFilterModalOpen = signal<boolean>(false)
   currentPage = signal<number>(1)
   itemsPerPage = 20
+  sortOrder = 'title,asc'
+  totalPages = signal<number>(0)
   filteredProducts = computed(() => this.products())
 
-  totalPages = computed(() => {
-    return Math.ceil(this.filteredProducts().length / this.itemsPerPage)
-  })
-
   paginatedProducts = computed(() => {
-    const start = (this.currentPage() - 1) * this.itemsPerPage
-    const end = start + this.itemsPerPage
-    return this.filteredProducts().slice(start, end)
+    return this.filteredProducts()
   })
 
   ngOnInit() {
@@ -74,8 +70,12 @@ export class Home implements OnInit {
   }
 
   private loadAllBooks() {
-    this.bookService.getBooks().subscribe({
-      next: value => this.products.set(value.content),
+    const currentBackendPage = this.currentPage() - 1
+    this.bookService.getBooks(currentBackendPage, this.itemsPerPage, this.sortOrder).subscribe({
+      next: value => {
+        this.products.set(value.content)
+        this.totalPages.set(Math.max(value.totalPages ?? 0, 0))
+      },
       error: (error: unknown) => console.error(error)
     })
   }
@@ -128,6 +128,7 @@ export class Home implements OnInit {
     this.publishedDate.set('')
     this.selectedAvailability.set('all')
     this.currentPage.set(1)
+    this.totalPages.set(0)
     this.router.navigateByUrl('/products')
     this.loadAllBooks()
     this.closeFilterModal()
@@ -209,15 +210,30 @@ export class Home implements OnInit {
       search.authors = selectedAuthorIds
     }
 
-    const hasFilters = Object.keys(search).length > 0
+    const hasFilters = Boolean(
+      title
+      || isbn
+      || date
+      || selectedAvailability === 'true'
+      || selectedAvailability === 'false'
+      || selectedCategoryIds.length > 0
+      || selectedAuthorIds.length > 0
+    )
 
     if (!hasFilters) {
       this.loadAllBooks()
       return
     }
 
+    search.page = this.currentPage() - 1
+    search.size = this.itemsPerPage
+    search.sort = this.sortOrder
+
     this.bookService.searchBooks(search).subscribe({
-      next: value => this.products.set(value.content),
+      next: value => {
+        this.products.set(value.content)
+        this.totalPages.set(Math.max(value.totalPages ?? 0, 0))
+      },
       error: (error: unknown) => console.error(error)
     })
   }
@@ -248,6 +264,7 @@ export class Home implements OnInit {
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page)
+      this.executeSearch()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -255,6 +272,7 @@ export class Home implements OnInit {
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update(page => page + 1)
+      this.executeSearch()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -262,6 +280,7 @@ export class Home implements OnInit {
   prevPage() {
     if (this.currentPage() > 1) {
       this.currentPage.update(page => page - 1)
+      this.executeSearch()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }

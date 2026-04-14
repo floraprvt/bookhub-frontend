@@ -1,13 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Book, BookSearchParams } from '../interface';
+import { Book, BookSearchParams, BooksPageResponse } from '../interface';
 
 const API_URL = 'http://localhost:8080';
 const BOOK_ENDPOINT = '/api/books'
-
-interface BooksResponse {
-  content: Book[];
-}
+const DEFAULT_PAGE = 0
+const DEFAULT_SIZE = 20
+const DEFAULT_SORT = 'title,asc'
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +14,13 @@ interface BooksResponse {
 export class BookService {
   private readonly http = inject(HttpClient);
 
-  getBooks() {
-    return this.http.get<BooksResponse>(`${API_URL}${BOOK_ENDPOINT}`);
+  getBooks(page = DEFAULT_PAGE, size = DEFAULT_SIZE, sort = DEFAULT_SORT) {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', sort)
+
+    return this.http.get<BooksPageResponse>(`${API_URL}${BOOK_ENDPOINT}`, { params });
   }
 
   getBookById(id: number) {
@@ -24,7 +28,10 @@ export class BookService {
   }
 
   searchBooks(search: BookSearchParams) {
-    let params = new HttpParams();
+    let params = new HttpParams()
+      .set('page', String(search.page ?? DEFAULT_PAGE))
+      .set('size', String(search.size ?? DEFAULT_SIZE))
+      .set('sort', search.sort ?? DEFAULT_SORT)
 
     if (search.title?.trim()) {
       const normalizedTitle = search.title.trim().replace(/%/g, '');
@@ -55,7 +62,7 @@ export class BookService {
       params = params.set('isbn', search.isbn.trim());
     }
 
-    return this.http.get<BooksResponse>(`${API_URL}${BOOK_ENDPOINT}/search`, { params });
+    return this.http.get<BooksPageResponse>(`${API_URL}${BOOK_ENDPOINT}/search`, { params });
   }
 
   addBook(book: Partial<Book>) {
