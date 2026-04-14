@@ -164,10 +164,12 @@ export class Profil implements OnInit {
   }
 
   deleteAccount() {
-    const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.");
-    if (confirmDelete) {
-      this.authService.logout();
-    }
+    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
+
+    this.authService.deleteAccount().subscribe({
+      next: () => this.router.navigate(['/login']),
+      error: (err) => alert(err.error?.message ?? 'Une erreur est survenue, réessayez.')
+    });
   }
 
   cancelReservation(id: number) {

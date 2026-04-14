@@ -64,6 +64,15 @@ export class AuthService {
     return this.http.put<void>(`${API_URL}/api/users/me/password`, { currentPassword, newPassword });
   }
 
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/api/users/me`).pipe(
+      tap(() => {
+        localStorage.removeItem('currentUser');
+        this.currentUserSignal.set(null);
+      })
+    );
+  }
+
   logout(): void {
     localStorage.removeItem('currentUser');
     this.currentUserSignal.set(null);
