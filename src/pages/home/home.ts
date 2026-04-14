@@ -2,7 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, signal, inject, OnInit } 
 import { Router, ActivatedRoute } from '@angular/router';
 import { BookService } from '../../app/services/book';
 import { ProductCardComponent } from '../../app/components/cards/cards';
-import { Book } from '../../app/interface';
+import { AuthorService } from '../../app/services/author';
+import { CategoryService } from '../../app/services/category';
+import { Author, Book, BookSearchParams, Category } from '../../app/interface';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -12,25 +15,26 @@ import { Book } from '../../app/interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home implements OnInit {
-  private router = inject(Router)
-  private route = inject(ActivatedRoute)
-  private bookService = inject(BookService)
+  private readonly router = inject(Router)
+  private readonly route = inject(ActivatedRoute)
+  private readonly bookService = inject(BookService)
+  private readonly authorService = inject(AuthorService)
+  private readonly categoryService = inject(CategoryService)
 
   products = signal<Book[]>([])
+  authors = signal<Author[]>([])
+  categories = signal<Category[]>([])
   searchTerm = signal<string>('')
-
-  selectedCategory = signal<string>('all')
+  isbnTerm = signal<string>('')
+  selectedAuthorIds = signal<number[]>([])
+  selectedCategoryIds = signal<number[]>([])
+  initialCategoryFromRoute = signal<string>('')
+  publishedDate = signal<string>('')
+  selectedAvailability = signal<string>('all')
+  isFilterModalOpen = signal<boolean>(false)
   currentPage = signal<number>(1)
   itemsPerPage = 20
-  filteredProducts = computed(() => {
-    const category = this.selectedCategory()
-    if (category === 'all') {
-      return this.products()
-    }
-    return this.products().filter(p => 
-      p.category.some(c => c.name === category)
-    )
-  })
+  filteredProducts = computed(() => this.products())
 
   totalPages = computed(() => {
     return Math.ceil(this.filteredProducts().length / this.itemsPerPage)
@@ -45,10 +49,28 @@ export class Home implements OnInit {
   ngOnInit() {
     const urlSegment = this.route.snapshot.url[1]?.path
     if (urlSegment) {
-      this.selectedCategory.set(urlSegment)
+      this.initialCategoryFromRoute.set(urlSegment)
     }
 
-    this.loadAllBooks()
+    this.loadFiltersAndBooks()
+  }
+
+  private loadFiltersAndBooks() {
+    forkJoin({
+      authors: this.authorService.getAuthors(),
+      categories: this.categoryService.getCategories()
+    }).subscribe({
+      next: ({ authors, categories }) => {
+        this.authors.set(authors)
+        this.categories.set(categories)
+        this.applyRouteCategorySelection()
+        this.executeSearch()
+      },
+      error: (error: unknown) => {
+        console.error(error)
+        this.loadAllBooks()
+      }
+    })
   }
 
   private loadAllBooks() {
@@ -63,29 +85,141 @@ export class Home implements OnInit {
   }
 
   onSearch() {
-    const title = this.searchTerm().trim()
+    this.currentPage.set(1)
+    this.executeSearch()
+    this.closeFilterModal()
+  }
 
-    if (!title) {
-      this.currentPage.set(1)
+  openFilterModal() {
+    this.isFilterModalOpen.set(true)
+  }
+
+  closeFilterModal() {
+    this.isFilterModalOpen.set(false)
+  }
+
+  onCategorySelectionChange(event: Event) {
+    const selectedIds = this.extractSelectedNumericValues(event)
+    this.selectedCategoryIds.set(selectedIds)
+  }
+
+  onAuthorSelectionChange(event: Event) {
+    const selectedIds = this.extractSelectedNumericValues(event)
+    this.selectedAuthorIds.set(selectedIds)
+  }
+
+  onDateChange(date: string) {
+    this.publishedDate.set(date)
+  }
+
+  onAvailabilityChange(value: string) {
+    this.selectedAvailability.set(value)
+  }
+
+  onIsbnInput(value: string) {
+    this.isbnTerm.set(value)
+  }
+
+  resetFilters() {
+    this.searchTerm.set('')
+    this.isbnTerm.set('')
+    this.selectedCategoryIds.set([])
+    this.selectedAuthorIds.set([])
+    this.publishedDate.set('')
+    this.selectedAvailability.set('all')
+    this.currentPage.set(1)
+    this.router.navigateByUrl('/products')
+    this.loadAllBooks()
+    this.closeFilterModal()
+  }
+
+  getAuthorDisplayName(author: Author): string {
+    return `${author.firstName} ${author.lastName}`.trim()
+  }
+
+  isCategorySelected(categoryId: string | number): boolean {
+    const id = Number(categoryId)
+    return Number.isFinite(id) && this.selectedCategoryIds().includes(id)
+  }
+
+  isAuthorSelected(authorId: string | number): boolean {
+    const id = Number(authorId)
+    return Number.isFinite(id) && this.selectedAuthorIds().includes(id)
+  }
+
+  private applyRouteCategorySelection() {
+    const categoryName = this.initialCategoryFromRoute().trim().toLowerCase()
+    if (!categoryName) {
+      return
+    }
+
+    const category = this.categories().find(currentCategory => currentCategory.name.trim().toLowerCase() === categoryName)
+    if (!category) {
+      return
+    }
+
+    const id = Number(category.id)
+    if (Number.isFinite(id)) {
+      this.selectedCategoryIds.set([id])
+    }
+  }
+
+  private extractSelectedNumericValues(event: Event): number[] {
+    const selectElement = event.target as HTMLSelectElement | null
+    if (!selectElement) {
+      return []
+    }
+
+    return Array.from(selectElement.selectedOptions)
+      .map(option => Number(option.value))
+      .filter(value => Number.isFinite(value))
+  }
+
+  private executeSearch() {
+    const title = this.searchTerm().trim()
+    const isbn = this.isbnTerm().trim()
+    const selectedAuthorIds = this.selectedAuthorIds()
+    const selectedCategoryIds = this.selectedCategoryIds()
+    const date = this.publishedDate().trim()
+    const selectedAvailability = this.selectedAvailability()
+
+    const search: BookSearchParams = {}
+
+    if (title) {
+      search.title = title
+    }
+
+    if (isbn) {
+      search.isbn = isbn
+    }
+
+    if (date) {
+      search.date = date
+    }
+
+    if (selectedAvailability === 'true' || selectedAvailability === 'false') {
+      search.isAvailable = selectedAvailability === 'true'
+    }
+
+    if (selectedCategoryIds.length > 0) {
+      search.categoryList = selectedCategoryIds
+    }
+
+    if (selectedAuthorIds.length > 0) {
+      search.authors = selectedAuthorIds
+    }
+
+    const hasFilters = Object.keys(search).length > 0
+
+    if (!hasFilters) {
       this.loadAllBooks()
       return
     }
 
-    this.bookService.searchBooks({ title }).subscribe({
-      next: value => {
-        this.products.set(value.content)
-        this.currentPage.set(1)
-      },
+    this.bookService.searchBooks(search).subscribe({
+      next: value => this.products.set(value.content),
       error: (error: unknown) => console.error(error)
     })
-  }
-
-  onCategoryChange(category: string) {
-    this.selectedCategory.set(category)
-    this.currentPage.set(1)
-
-    const newUrl = category === 'all' ? '/products' : `/products/${category}`
-    this.router.navigateByUrl(newUrl)
   }
 
   visiblePages = computed(() => {

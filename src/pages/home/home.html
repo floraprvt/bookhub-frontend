@@ -1,64 +1,155 @@
-<div class="flex justify-between p-12 items-center flex-col md:flex-row">
-  <div class="inline-flex border-b border-black pb-5 w-fit mt-8">
-    <h2 class="font-bold text-2xl text-black mr-4 lg:mr-20">Filtres</h2>
-    <div class="inline-flex flex-row gap-2 sm:gap-6 lg:gap-4 flex-wrap text-sm sm:text-xl lg:text-base">
+<div class="p-6 md:p-12">
+  <div class="flex flex-wrap items-center justify-between gap-3 border border-[#162D3A] rounded-2xl p-4 md:p-6 bg-white shadow-sm">
+    <div>
+      <h2 class="font-bold text-2xl text-[#162D3A]">Catalogue</h2>
+      <p class="text-sm text-gray-600">Utilisez les filtres avances dans une fenetre modale.</p>
+    </div>
 
-      <label>
-        <input name="category" type="radio" class="peer hidden"
-               [checked]="selectedCategory() === 'all'"
-               (change)="onCategoryChange('all')" />
-        <p class="shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border peer-checked:bg-[#162D3A] text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Voir tout</p>
-      </label>
+    <div class="flex gap-3">
+      <button
+        type="button"
+        (click)="openFilterModal()"
+        class="font-semibold cursor-pointer bg-[#162D3A] text-white px-6 py-3 rounded-xl hover:bg-opacity-90 transition-all">
+        Ouvrir les filtres
+      </button>
 
-      <label>
-        <input name="category" type="radio" class="peer hidden"
-               [checked]="selectedCategory() === 'moteur'"
-               (change)="onCategoryChange('moteur')" />
-        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Categorie</p>
-      </label>
-
-      <label>
-        <input name="category" type="radio" class="peer hidden"
-               [checked]="selectedCategory() === 'freinage'"
-               (change)="onCategoryChange('freinage')" />
-        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Disponibilité</p>
-      </label>
-
-      <label>
-        <input name="category" type="radio" class="peer hidden"
-               [checked]="selectedCategory() === 'freinage'"
-               (change)="onCategoryChange('freinage')" />
-        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Note</p>
-      </label>
-
-      <label>
-        <input name="category" type="radio" class="peer hidden"
-               [checked]="selectedCategory() === 'freinage'"
-               (change)="onCategoryChange('freinage')" />
-        <p class="peer-checked:bg-[#162D3A] shadow-xl peer-checked:text-white peer-checked:border-black peer-checked:border text-black p-1 px-2 rounded-full cursor-pointer select-none font-medium transition-colors">Auteur</p>
-      </label>
+      <button
+        type="button"
+        (click)="resetFilters()"
+        class="font-semibold cursor-pointer border border-[#162D3A] text-[#162D3A] px-6 py-3 rounded-xl hover:bg-[#162D3A] hover:text-white transition-all">
+        Reinitialiser
+      </button>
     </div>
   </div>
 
-  <div class="flex mt-4 md:mt-0 gap-3 items-center">
-    <input
-      type="text"
-      [value]="searchTerm()"
-      (input)="onSearchInput($any($event.target).value)"
-      (keydown.enter)="onSearch()"
-      placeholder="Rechercher un livre par titre"
-      aria-label="Rechercher un livre"
-      class="h-fit border border-[#162D3A] rounded-full px-5 py-4 min-w-72 focus:outline-none focus:ring-2 focus:ring-[#162D3A]"
-    />
+  @if(isFilterModalOpen()) {
+    <div
+      class="fixed inset-0 z-50 bg-black/45 flex items-center justify-center p-4"
+      (click)="closeFilterModal()"
+      (keydown.escape)="closeFilterModal()"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Filtres de recherche">
 
-    <button
-      type="button"
-      (click)="onSearch()"
-      class="flex gap-3 font-semibold text-xl cursor-pointer h-fit bg-[#162D3A] text-white p-4 px-8 rounded-full w-fit items-center hover:bg-opacity-90 transition-all">
-      Recherche
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-    </button>
-  </div>
+      <div
+        class="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-[#162D3A] shadow-2xl p-6"
+        (click)="$event.stopPropagation()">
+
+        <div class="flex items-center justify-between gap-4 mb-5">
+          <h3 class="font-bold text-2xl text-[#162D3A]">Filtres de recherche</h3>
+          <button
+            type="button"
+            (click)="closeFilterModal()"
+            class="h-10 w-10 rounded-full border border-[#162D3A] text-[#162D3A] hover:bg-[#162D3A] hover:text-white transition-colors"
+            aria-label="Fermer la fenetre des filtres">
+            X
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-[#162D3A]">Titre</span>
+            <input
+              type="text"
+              [value]="searchTerm()"
+              (input)="onSearchInput($any($event.target).value)"
+              (keydown.enter)="onSearch()"
+              placeholder="Ex: Le Petit Prince"
+              aria-label="Filtrer par titre"
+              class="h-12 border border-[#162D3A] rounded-xl px-4 focus:outline-none focus:ring-2 focus:ring-[#162D3A]"
+            />
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-[#162D3A]">Categorie</span>
+            <select
+              multiple
+              (change)="onCategorySelectionChange($event)"
+              aria-label="Filtrer par categorie"
+              class="min-h-32 border border-[#162D3A] rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#162D3A]">
+              @for(category of categories(); track category.id) {
+                <option [value]="category.id" [selected]="isCategorySelected(category.id)">{{ category.name }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-[#162D3A]">Auteur</span>
+            <select
+              multiple
+              (change)="onAuthorSelectionChange($event)"
+              aria-label="Filtrer par auteur"
+              class="min-h-32 border border-[#162D3A] rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#162D3A]">
+              @for(author of authors(); track author.id) {
+                <option [value]="author.id" [selected]="isAuthorSelected(author.id)">{{ getAuthorDisplayName(author) }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-[#162D3A]">Date de publication</span>
+            <input
+              type="date"
+              [value]="publishedDate()"
+              (change)="onDateChange($any($event.target).value)"
+              aria-label="Filtrer par date"
+              class="h-12 border border-[#162D3A] rounded-xl px-4 focus:outline-none focus:ring-2 focus:ring-[#162D3A]"
+            />
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-[#162D3A]">Disponibilite</span>
+            <select
+              [value]="selectedAvailability()"
+              (change)="onAvailabilityChange($any($event.target).value)"
+              aria-label="Filtrer par disponibilite"
+              class="h-12 border border-[#162D3A] rounded-xl px-4 bg-white focus:outline-none focus:ring-2 focus:ring-[#162D3A]">
+              <option value="all">Toutes</option>
+              <option value="true">Disponible</option>
+              <option value="false">Indisponible</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-[#162D3A]">ISBN</span>
+            <input
+              type="text"
+              [value]="isbnTerm()"
+              (input)="onIsbnInput($any($event.target).value)"
+              (keydown.enter)="onSearch()"
+              placeholder="Ex: 978-2-07-040918-8"
+              aria-label="Filtrer par isbn"
+              class="h-12 border border-[#162D3A] rounded-xl px-4 focus:outline-none focus:ring-2 focus:ring-[#162D3A]"
+            />
+          </label>
+        </div>
+
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button
+            type="button"
+            (click)="onSearch()"
+            class="flex gap-2 font-semibold cursor-pointer bg-[#162D3A] text-white px-6 py-3 rounded-xl w-fit items-center hover:bg-opacity-90 transition-all">
+            Rechercher
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+          </button>
+
+          <button
+            type="button"
+            (click)="resetFilters()"
+            class="font-semibold cursor-pointer border border-[#162D3A] text-[#162D3A] px-6 py-3 rounded-xl hover:bg-[#162D3A] hover:text-white transition-all">
+            Reinitialiser
+          </button>
+
+          <button
+            type="button"
+            (click)="closeFilterModal()"
+            class="font-semibold cursor-pointer border border-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-100 transition-all">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
 
 <main>
@@ -78,7 +169,7 @@
 
     @if(filteredProducts().length === 0) {
       <div class="w-full text-center mt-12">
-        <p class="text-gray-500 text-xl font-medium">Aucun produit trouvé dans cette catégorie.</p>
+        <p class="text-gray-500 text-xl font-medium">Aucun livre ne correspond aux filtres appliques.</p>
       </div>
     }
   </div>
