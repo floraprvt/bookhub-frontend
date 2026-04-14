@@ -42,12 +42,16 @@ export interface Book {
 }
 
 export interface Loan {
-    id: number | string;
-    loanDate: Date | string;
-    returnDate: Date | string;
+    id: number;
+    loanDate: string;
+    returnDate: string;
     isReturned: boolean;
-    user: User;
-    book: Book;
+    userId: number;
+    bookId: number;
+    firstName: string;
+    lastName: string;
+    bookTitle: string;
+    late: boolean;
 }
 
 export interface Rating{

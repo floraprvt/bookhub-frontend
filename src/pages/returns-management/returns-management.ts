@@ -2,21 +2,9 @@ import { Component, signal, OnInit, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { RouterLink, RouterLinkActive } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
+import { Loan } from '../../app/interface'
 
 const API_URL = 'http://localhost:8080'
-
-export interface Loan {
-  id: number
-  loanDate: string
-  returnDate: string
-  isReturned: boolean
-  userId: number
-  bookId: number
-  firstName: string
-  lastName: string
-  bookTitle: string
-  late: boolean
-}
 
 @Component({
   selector: 'app-returns-management',
