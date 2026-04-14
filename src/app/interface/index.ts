@@ -41,6 +41,35 @@ export interface Book {
     alt?: string;
 }
 
+export interface BookCatalog {
+  id: string | number
+  title: string
+  authors: string[]
+  authorIds: Array<string | number>
+  categories: string[]
+  categoryIds: Array<string | number>
+  isbn: string
+  description: string
+  image: string
+  date: string
+  availableCopies: number
+  totalCopies: number
+  hasActiveBorrows: boolean
+}
+
+export interface BookFormData {
+  title: string
+  selectedAuthorIds: Array<string | number>
+  selectedCategoryIds: Array<string | number>
+  isbn: string
+  description: string
+  image: string
+  date: string
+  availableCopies: number
+  totalCopies: number
+  hasActiveBorrows: boolean
+}
+
 export interface Loan {
     id: number;
     loanDate: string;

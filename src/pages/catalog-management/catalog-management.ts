@@ -2,39 +2,10 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { RouterLink, RouterLinkActive } from '@angular/router'
-import { Author, Book, Category } from '../../app/interface'
+import { Author, Book, BookCatalog, BookFormData, Category } from '../../app/interface'
 import { BookService } from '../../app/services/book'
 import { AuthorService } from '../../app/services/author'
 import { CategoryService } from '../../app/services/category'
-
-export interface BookCatalog {
-  id: string | number
-  title: string
-  authors: string[]
-  authorIds: Array<string | number>
-  categories: string[]
-  categoryIds: Array<string | number>
-  isbn: string
-  description: string
-  image: string
-  date: string
-  availableCopies: number
-  totalCopies: number
-  hasActiveBorrows: boolean
-}
-
-interface BookFormData {
-  title: string
-  selectedAuthorIds: Array<string | number>
-  selectedCategoryIds: Array<string | number>
-  isbn: string
-  description: string
-  image: string
-  date: string
-  availableCopies: number
-  totalCopies: number
-  hasActiveBorrows: boolean
-}
 
 @Component({
   selector: 'app-catalog-management',
@@ -170,7 +141,7 @@ export class CatalogManagement implements OnInit {
         return
       }
 
-      this.bookService.updateBook(editingBookId, payload).subscribe({
+      this.bookService.updateBook(payload).subscribe({
         next: () => {
           this.loadBooks()
           this.closeModal()
