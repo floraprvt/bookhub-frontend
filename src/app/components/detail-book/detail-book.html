@@ -104,7 +104,7 @@
                           </svg>
                         }
                       </div>
-                      <textarea [(ngModel)]="editComment" name="editComment" rows="2"
+                      <textarea [(ngModel)]="editComment" name="editComment" rows="2" maxlength="1000"
                         class="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none resize-none text-sm">
                       </textarea>
                       <div class="flex gap-2 justify-end">
@@ -172,6 +172,7 @@
                   [(ngModel)]="newComment" name="comment"
                   placeholder="Partagez votre avis sur ce livre..."
                   rows="3"
+                  maxlength="1000"
                   class="w-full px-4 py-3 rounded-xl border border-gray-300 outline-none resize-none text-sm">
                 </textarea>
                 @if(ratingSuccess()) {
