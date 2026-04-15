@@ -1,5 +1,5 @@
 import { Component, inject, input, InputSignal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 
 @Component({
@@ -9,14 +9,12 @@ import { AuthService } from '../../../services/auth';
   styleUrl: './header.css',
 })
 export class Header {
-  // Utilisation d'un InputSignal pour recevoir le titre depuis le composant parent
   title: InputSignal<string> = input('Header');
 
-  // Injection de services
   private readonly authService = inject(AuthService);
 
-  // Utilisation des signals
   isLoggedIn = this.authService.isAuthenticated;
   currentUser = this.authService.currentUser;
-
+  isLibrarian = this.authService.isLibrarian;
+  isAdmin = this.authService.isAdmin;
 }

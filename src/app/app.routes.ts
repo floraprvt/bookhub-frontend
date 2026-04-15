@@ -10,18 +10,24 @@ import { LibrarianDashboard } from '../pages/librarian-dashboard/librarian-dashb
 import { AdminDashboard } from '../pages/admin/admin';
 import { EditUser } from './components/edit-user/edit-user';
 import { DetailBook } from './components/detail-book/detail-book';
+import { adminGuard } from './guards/admin.guard';
+import { librarianGuard } from './guards/librarian.guard';
 
 
 export const routes: Routes = [
-    { path: '', component: Home, canActivate: [authGuard] },
     { path: 'register', component: Register },
     { path: 'login', component: Login },
-    { path: 'catalogue-management', component: CatalogManagement, canActivate: [authGuard]},
-    { path: 'returns-management', component: ReturnsManagement, canActivate: [authGuard]},
-    { path: 'librarian', component: LibrarianDashboard, canActivate: [authGuard]},
-    { path: 'admin', component: AdminDashboard, canActivate: [authGuard]},
-    { path: 'admin/edit-user/:id', component: EditUser, canActivate: [authGuard]},
+    
+    { path: '', component: Home, canActivate: [authGuard] },
     { path: 'detail-book/:id', component: DetailBook, canActivate: [authGuard]},
     { path: 'profil', component: Profil, canActivate: [authGuard] },
-    { path: '**', redirectTo: '', pathMatch: 'full' },
+
+    { path: 'returns-management', component: ReturnsManagement, canActivate: [librarianGuard]},
+    { path: 'catalogue-management', component: CatalogManagement, canActivate: [librarianGuard]},
+    { path: 'librarian', component: LibrarianDashboard, canActivate: [librarianGuard]},
+
+    { path: 'admin', component: AdminDashboard, canActivate: [adminGuard]},
+    { path: 'admin/edit-user/:id', component: EditUser, canActivate: [adminGuard]},
+
+    { path: '**', redirectTo: 'login', pathMatch: 'full' },
 ]
