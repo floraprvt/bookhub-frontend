@@ -1,6 +1,5 @@
 <a [routerLink]="['/detail-book', id()]" class="w-fit">
   <div class="shadow-2xl flex flex-col justify-between items-center w-80 lg:w-96 p-6 rounded-3xl h-[29rem] relative transition-transform duration-300 transform hover:scale-110 group hover:z-20">
-
     <div class="w-full">
       <p class="font-bold text-3xl w-full">{{ title() }}</p>
        <div class="w-full flex items-center mt-2 flex-wrap gap-4">
@@ -15,7 +14,7 @@
 
       <img
         class="max-w-30 lg:max-w-40 transition-transform duration-300 transform group-hover:scale-110"
-        [src]="imageSrc()"
+        [src]="imageSrc() || 'assets/livre.webp'"
         [alt]="alt()"
         loading="lazy"
       >
@@ -41,6 +40,5 @@
         <circle cx="12" cy="12" r="3"/>
       </svg>
     </div>
-
   </div>
 </a>
