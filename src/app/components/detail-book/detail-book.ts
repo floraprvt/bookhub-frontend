@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Book } from '../../interface'
 import { BookService } from '../../services/book'
+import { LoanService } from '../../services/loan'
 import { AuthService } from '../../services/auth'
 
 @Component({
@@ -16,6 +17,7 @@ export class DetailBook implements OnInit {
   private route = inject(ActivatedRoute)
   private router = inject(Router)
   private bookService = inject(BookService)
+  private loanService = inject(LoanService)
   private authService = inject(AuthService)
   
   book = signal<Book | null>(null)
@@ -32,6 +34,9 @@ export class DetailBook implements OnInit {
   isSubmitting = signal(false)
   ratingSuccess = signal(false)
   ratingError = signal<string | false>(false)
+  isBorrowing = signal(false)
+  borrowSuccess = signal(false)
+  borrowError = signal<string | false>(false)
 
   editingRatingId = signal<number | string | null>(null)
   editScore = signal(0)
@@ -68,9 +73,28 @@ export class DetailBook implements OnInit {
   }
 
   emprunter() {
-    alert('Demande d\'emprunt enregistrée pour 14 jours !')
-  }
+    const currentBook = this.book()
+    if (!currentBook) return
 
+    this.isBorrowing.set(true)
+    this.borrowSuccess.set(false)
+    this.borrowError.set(false)
+
+    this.loanService.createLoan(currentBook.id).subscribe({
+      next: () => {
+        this.isBorrowing.set(false)
+        this.borrowSuccess.set(true)
+        
+        this.book.update(b => b ? { ...b, isAvailable: false } : null)
+      },
+      error: (err) => {
+        this.isBorrowing.set(false)
+        const errorMessage = err.error?.error || err.error?.message || "Erreur lors de l'emprunt du livre."
+        
+        this.borrowError.set(errorMessage)
+      }
+    })
+  }
   reserver() {
     alert('Livre réservé ! Vous serez notifié dès qu\'il sera disponible.')
   }
