@@ -19,6 +19,8 @@ export class AuthService {
  
   public isAuthenticated = computed(() => this.currentUserSignal() !== null);
   public currentUser = computed(() => this.currentUserSignal());
+  public isAdmin = computed(() => this.currentUserSignal()?.role === 'ADMIN');
+  public isLibrarian = computed(() => this.currentUserSignal()?.role === 'LIBRARIAN');
  
   constructor() {
     const storedUser = localStorage.getItem('currentUser');
@@ -79,7 +81,10 @@ export class AuthService {
   }
  
   register(userData: Registered): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${API_URL}/api/auth/register`, userData).pipe(
+    const payload: Partial<Registered> = { ...userData };
+    if (!payload.phone) delete payload.phone;
+    if (!payload.password) delete payload.password;
+    return this.http.post<LoginResponse>(`${API_URL}/api/auth/register`, payload).pipe(
       tap((response) => {
         const userToStore: Partial<User> = {
           email: userData.email,

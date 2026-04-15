@@ -1,5 +1,6 @@
 import { Component, signal, OnInit, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Book } from '../../interface'
 import { BookService } from '../../services/book'
@@ -7,7 +8,7 @@ import { BookService } from '../../services/book'
 @Component({
   selector: 'app-detail-book',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './detail-book.html'
 })
 export class DetailBook implements OnInit {
@@ -16,18 +17,32 @@ export class DetailBook implements OnInit {
   private bookService = inject(BookService)
   
   book = signal<Book | null>(null)
+  ratings = signal<any[]>([])
   starsArray = [1, 2, 3, 4, 5]
+
+  newScore = signal(0)
+  hoverScore = signal(0)
+  newComment = ''
+  isSubmitting = signal(false)
+  ratingSuccess = signal(false)
+  ratingError = signal<string | false>(false)
 
   ngOnInit() {
     const bookParamId = this.route.snapshot.paramMap.get('id')
-    
     if (bookParamId) {
       const bookId = Number(bookParamId)
       this.bookService.getBookById(bookId).subscribe({
-        next: ((value) => this.book.set(value)),
-        error: ((error: any) => console.log(error))
+        next: (value) => this.book.set(value),
+        error: (error: any) => console.log(error)
       })
+      this.loadRatings(bookId)
     }
+  }
+
+  loadRatings(bookId: number) {
+    this.bookService.getRatings(bookId).subscribe({
+      next: (data) => this.ratings.set(data)
+    })
   }
 
   // loadBook(id: string) {
@@ -78,5 +93,28 @@ export class DetailBook implements OnInit {
 
   reserver() {
     alert('Livre réservé ! Vous serez notifié dès qu\'il sera disponible.')
+  }
+
+  submitRating() {
+    const book = this.book()
+    if (!book || this.newScore() === 0) return
+
+    this.isSubmitting.set(true)
+    this.ratingSuccess.set(false)
+    this.ratingError.set(false)
+
+    this.bookService.addRating(book.id, this.newScore(), this.newComment).subscribe({
+      next: () => {
+        this.isSubmitting.set(false)
+        this.ratingSuccess.set(true)
+        this.newScore.set(0)
+        this.newComment = ''
+        this.loadRatings(Number(book.id))
+      },
+      error: (err) => {
+        this.isSubmitting.set(false)
+        this.ratingError.set(err.error?.message ?? 'Une erreur est survenue.')
+      }
+    })
   }
 }

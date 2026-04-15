@@ -2,39 +2,11 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { RouterLink, RouterLinkActive } from '@angular/router'
-import { Author, Book, Category } from '../../app/interface'
+import { Author, Book, BookCatalog, BookFormData, Category } from '../../app/interface'
 import { BookService } from '../../app/services/book'
 import { AuthorService } from '../../app/services/author'
 import { CategoryService } from '../../app/services/category'
-
-export interface BookCatalog {
-  id: string | number
-  title: string
-  authors: string[]
-  authorIds: Array<string | number>
-  categories: string[]
-  categoryIds: Array<string | number>
-  isbn: string
-  description: string
-  image: string
-  date: string
-  availableCopies: number
-  totalCopies: number
-  hasActiveBorrows: boolean
-}
-
-interface BookFormData {
-  title: string
-  selectedAuthorIds: Array<string | number>
-  selectedCategoryIds: Array<string | number>
-  isbn: string
-  description: string
-  image: string
-  date: string
-  availableCopies: number
-  totalCopies: number
-  hasActiveBorrows: boolean
-}
+import { AuthService } from '../../app/services/auth'
 
 @Component({
   selector: 'app-catalog-management',
@@ -46,6 +18,7 @@ export class CatalogManagement implements OnInit {
   private readonly bookService = inject(BookService)
   private readonly authorService = inject(AuthorService)
   private readonly categoryService = inject(CategoryService)
+  private readonly authService = inject(AuthService)
 
   books = signal<BookCatalog[]>([])
   authors = signal<Author[]>([])
@@ -58,6 +31,8 @@ export class CatalogManagement implements OnInit {
   isSaving = signal<boolean>(false)
   loadError = signal<string>('')
   bookForm: BookFormData = this.createEmptyBookForm()
+
+  isAdmin = this.authService.isAdmin
 
   filteredBooks = computed(() => {
     const query = this.searchQuery().trim().toLowerCase()
@@ -84,12 +59,21 @@ export class CatalogManagement implements OnInit {
   }
 
   deleteBook(book: BookCatalog) {
-    if (book.hasActiveBorrows) {
+    if (book.isAvailable === false) {
       alert("Impossible de supprimer ce livre car des emprunts sont en cours")
       return
     }
     if (confirm(`Êtes-vous sûr de vouloir supprimer ${book.title} ?`)) {
-      this.books.update(books => books.filter(b => b.id !== book.id))
+      const bookId = Number(book.id)
+      this.bookService.deleteBook(bookId).subscribe({
+        next: () => {
+          this.loadBooks()
+        },
+        error: (error: unknown) => {
+          console.error(error)
+          alert("Une erreur est survenue lors de la suppression du livre.")
+        }
+      })
     }
   }
 
@@ -109,9 +93,7 @@ export class CatalogManagement implements OnInit {
       description: bookToEdit.description,
       image: bookToEdit.image,
       date: bookToEdit.date,
-      availableCopies: bookToEdit.availableCopies,
-      totalCopies: bookToEdit.totalCopies,
-      hasActiveBorrows: bookToEdit.hasActiveBorrows
+      isAvailable: bookToEdit.isAvailable
     }
     this.isModalOpen.set(true)
   }
@@ -140,11 +122,7 @@ export class CatalogManagement implements OnInit {
       return
     }
 
-    if (this.bookForm.totalCopies < 0 || this.bookForm.availableCopies < 0) {
-      return
-    }
-
-    if (this.bookForm.availableCopies > this.bookForm.totalCopies) {
+    if (this.bookForm.isAvailable === false) {
       return
     }
 
@@ -170,7 +148,7 @@ export class CatalogManagement implements OnInit {
         return
       }
 
-      this.bookService.updateBook(editingBookId, payload).subscribe({
+      this.bookService.updateBook(payload).subscribe({
         next: () => {
           this.loadBooks()
           this.closeModal()
@@ -193,15 +171,13 @@ export class CatalogManagement implements OnInit {
       description: '',
       image: '',
       date: '',
-      availableCopies: 1,
-      totalCopies: 1,
-      hasActiveBorrows: false
+      isAvailable: true
     }
   }
 
   private loadBooks() {
     this.loadError.set('')
-    this.bookService.getBooks().subscribe({
+    this.bookService.getBooks(0, 500, 'title,asc').subscribe({
       next: (response) => {
         this.books.set(response.content.map(book => this.toCatalogBook(book)))
       },
@@ -255,9 +231,7 @@ export class CatalogManagement implements OnInit {
       description: book.description ?? '',
       image: book.image ?? '',
       date: this.toDateInputValue(book.date),
-      availableCopies,
-      totalCopies,
-      hasActiveBorrows: totalCopies > availableCopies
+      isAvailable: book.isAvailable,
     }
   }
 
@@ -270,9 +244,7 @@ export class CatalogManagement implements OnInit {
       category: this.toApiCategories(selectedCategoryIds),
       image,
       date,
-      isAvailable: this.bookForm.availableCopies > 0,
-      availableCopies: this.bookForm.availableCopies,
-      totalCopies: this.bookForm.totalCopies
+      isAvailable: this.bookForm.isAvailable,
     }
     
     if (this.editingBookId()) {
