@@ -74,7 +74,7 @@ export class BookService {
   }
 
   deleteBook(id: number) {
-    return this.http.delete(`${API_URL}${BOOK_ENDPOINT}/${id}`);
+    return this.http.delete(`${API_URL}${BOOK_ENDPOINT}/${id}`, { responseType: 'text' });
   }
   
   getRatings(bookId: number | string) {
