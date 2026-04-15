@@ -41,10 +41,15 @@
         </div>
     </div>
     <div class="hidden md:flex gap-4 h-fit">
-        <div class="flex gap-4">
+        <div class="flex gap-5">
             <a href="" class="text-blue-950 font-semibold">Catalogue</a>
-            <a routerLink="/profil" class="text-blue-950 font-semibold">Mes emprunts et réservations</a>
+            <a routerLink="/profil" class="text-blue-950 font-semibold">Emprunts & réservations</a>
+            @if (isLibrarian() || isAdmin()) {
             <a routerLink="/librarian" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
+            }
+            @if (isAdmin()) {
+            <a routerLink="/admin" class="text-blue-950 font-semibold">Utilisateurs</a>
+            }
         </div>
     </div>
     @if(isLoggedIn()) {
