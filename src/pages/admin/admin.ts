@@ -43,7 +43,9 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  editUser(id: string | number) {
+  editUser(id: string | number | undefined) {
+    if (!id) return;
+
     this.router.navigate(['/admin/edit-user', id]);
   }
 }
