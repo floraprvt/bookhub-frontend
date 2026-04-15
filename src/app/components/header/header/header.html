@@ -19,10 +19,13 @@
                         <label for="panneauDeux" class="menu-closed shadow-xl p-2 rounded-2xl">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                         </label>
-                        <a href="" class="shadow-xl p-2 rounded-2xl">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
-                        </a>
-                        <a href="/profil" class="shadow-xl p-2 rounded-2xl">
+                        <button (click)="toggleNotifications()" class="relative shadow-xl p-2 rounded-2xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+                            @if(unreadCount() > 0) {
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">{{ unreadCount() }}</span>
+                            }
+                        </button>
+                        <a routerLink="/profil" class="shadow-xl p-2 rounded-2xl">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </a>
                     </div>
@@ -43,6 +46,7 @@
             </div>
         </div>
     </div>
+
     <div class="hidden md:flex gap-4 h-fit">
         <div class="flex gap-5">
             <a href="" class="text-blue-950 font-semibold">Catalogue</a>
@@ -55,11 +59,39 @@
             }
         </div>
     </div>
+
     @if(isLoggedIn()) {
         <div class="flex gap-4">
-            <a routerLink="/" class="shadow-xl p-2 rounded-2xl" aria-label="Notifications">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
-            </a>
+            <div class="relative">
+                <button (click)="toggleNotifications()" class="relative shadow-xl p-2 rounded-2xl" aria-label="Notifications">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+                    @if(unreadCount() > 0) {
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">{{ unreadCount() }}</span>
+                    }
+                </button>
+
+                @if(showNotifications()) {
+                    <div class="fixed inset-0 z-40" (click)="closeNotifications()"></div>
+                    <div class="absolute right-0 top-12 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-gray-100">
+                            <h3 class="font-bold text-slate-800">Notifications</h3>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            @if(notifications().length === 0) {
+                                <p class="text-center text-gray-500 py-6 text-sm italic">Aucune notification</p>
+                            } @else {
+                                @for(notif of notifications(); track notif.id) {
+                                    <div class="px-4 py-3 border-b border-gray-50 last:border-0" [ngClass]="!notif.isRead ? 'bg-blue-50' : 'bg-white'">
+                                        <p class="text-sm text-slate-700">{{ notif.message }}</p>
+                                        <p class="text-xs text-gray-400 mt-1">{{ formatDate(notif.createdAt) }}</p>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
             <a routerLink="/profil" class="shadow-xl p-2 rounded-2xl" aria-label="Profil">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </a>
