@@ -90,15 +90,9 @@
                     <td class="py-4 text-slate-700">{{ overdue.returnDate | date:'dd/MM/yyyy' }}</td>
                     <td class="py-4 text-slate-700">{{ overdue.daysOverdue }} jours</td>
                     <td class="py-4 text-center">
-                      @if(overdue.daysOverdue > 5) {
-                        <button (click)="relancer(overdue.loanId)" class="bg-red-700 hover:bg-red-800 text-white font-medium px-4 py-1.5 rounded-full text-sm transition-colors">
-                          Relancer
-                        </button>
-                      } @else {
-                        <button (click)="gererRetour(overdue.loanId)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-1.5 rounded-full text-sm transition-colors w-40 md:w-fit">
-                          Gérer le Retour
-                        </button>
-                      }
+                      <button (click)="relancer(overdue.loanId)" class="bg-red-700 hover:bg-red-800 text-white font-medium px-4 py-1.5 rounded-full text-sm transition-colors">
+                        Relancer
+                      </button>
                     </td>
                   </tr>
                 }

@@ -88,7 +88,10 @@ export class LibrarianDashboard implements OnInit, AfterViewInit {
   }
 
   relancer(loanId: number) {
-    alert(`Relance envoyée pour l'emprunt #${loanId}`)
+    this.http.post(`${API_URL}/api/loans/${loanId}/remind`, {}).subscribe({
+      next: () => alert('Relance envoyée avec succès.'),
+      error: (err) => alert(err.error?.message ?? "Erreur lors de l'envoi de la relance.")
+    })
   }
 
   gererRetour(loanId: number) {
