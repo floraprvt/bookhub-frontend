@@ -56,7 +56,6 @@
 
     @if(isLoggedIn()) {
         <div class="flex gap-4">
-            <!-- Cloche avec badge et dropdown -->
             <div class="relative">
                 <button (click)="toggleNotifications()" class="relative shadow-xl p-2 rounded-2xl" aria-label="Notifications">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
@@ -66,10 +65,7 @@
                 </button>
 
                 @if(showNotifications()) {
-                    <!-- Backdrop pour fermer au clic extérieur -->
                     <div class="fixed inset-0 z-40" (click)="closeNotifications()"></div>
-
-                    <!-- Dropdown -->
                     <div class="absolute right-0 top-12 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
                         <div class="px-4 py-3 border-b border-gray-100">
                             <h3 class="font-bold text-slate-800">Notifications</h3>
