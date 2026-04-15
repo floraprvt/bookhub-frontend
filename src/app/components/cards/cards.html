@@ -3,12 +3,12 @@
 
     <div class="w-full">
       <p class="font-bold text-3xl w-full">{{ title() }}</p>
-       <div class="w-full flex items-center justify-between mt-2">
+       <div class="w-full flex items-center mt-2 flex-wrap gap-4">
         @for (category of categories(); track $index) {
-        <p class="text-gray-700 z-20">{{ category.name }}</p>
+          <p class="text-gray-700 z-20">{{ category.name }}</p>
         }
         @for (author of authors(); track $index) {
-        <p class="bg-[#162D3A] text-white py-1 px-4 rounded-full font-semibold">{{ author.firstName }} {{ author.lastName }}</p>
+          <p class="bg-[#162D3A] text-white py-1 px-4 rounded-full font-semibold">{{ author.firstName }} {{ author.lastName }}</p>
         }
       </div>
     </div>

@@ -9,7 +9,7 @@
 
     <label for="sidebar-close" class="fixed inset-0 bg-black/50 z-40 hidden peer-checked:block md:hidden"></label>
 
-    <aside class="w-64 bg-[#162D3A] flex flex-col py-6 absolute md:relative z-50 h-full lg:h-auto transform -translate-x-full peer-checked:translate-x-0 md:translate-x-0 transition-transform duration-300">
+    <aside class="w-64 bg-[#162D3A] flex flex-col py-6 absolute md:relative z-50 h-full md:h-auto transform -translate-x-full peer-checked:translate-x-0 md:translate-x-0 transition-transform duration-300">
       <div class="flex justify-end px-4 md:hidden mb-4">
         <label for="sidebar-close" class="text-white cursor-pointer p-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -108,7 +108,7 @@
             (click)="closeModal()"
             (keydown.escape)="closeModal()"
           >
-            <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl" (click)="$event.stopPropagation()">
+            <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl h-11/12 pb-4" (click)="$event.stopPropagation()">
               <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
                 <h2 id="catalog-modal-title" class="text-xl font-bold text-slate-800">
                   {{ modalMode() === 'create' ? 'Ajouter un livre' : 'Modifier un livre' }}
@@ -118,7 +118,7 @@
                 </button>
               </div>
 
-              <form class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2" #bookFormRef="ngForm" (ngSubmit)="saveBook()">
+              <form class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 overflow-y-scroll h-11/12" #bookFormRef="ngForm" (ngSubmit)="saveBook()">
                 <label class="flex flex-col gap-2 md:col-span-2">
                   <span class="text-sm font-semibold text-slate-700">Titre</span>
                   <input type="text" name="title" required [(ngModel)]="bookForm.title" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-[#162D3A]">
