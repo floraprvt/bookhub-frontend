@@ -37,6 +37,7 @@ export class DetailBook implements OnInit {
   isBorrowing = signal(false)
   borrowSuccess = signal(false)
   borrowError = signal<string | false>(false)
+  borrowedReturnDate = signal<string | null>(null)
 
   editingRatingId = signal<number | string | null>(null)
   editScore = signal(0)
@@ -79,12 +80,17 @@ export class DetailBook implements OnInit {
     this.isBorrowing.set(true)
     this.borrowSuccess.set(false)
     this.borrowError.set(false)
+    this.borrowedReturnDate.set(null)
 
     this.loanService.createLoan(currentBook.id).subscribe({
-      next: () => {
+      next: (res: any) => { 
         this.isBorrowing.set(false)
         this.borrowSuccess.set(true)
-        
+
+        if (res && res.returnDate) {
+           this.borrowedReturnDate.set(res.returnDate)
+        }
+
         this.book.update(b => b ? { ...b, isAvailable: false } : null)
       },
       error: (err) => {
