@@ -85,4 +85,13 @@ export class BookService {
     const date = new Date().toISOString().split('T')[0];
     return this.http.post(`${API_URL}/api/ratings/book/${bookId}`, { score, comment, date });
   }
+
+  updateRating(ratingId: number | string, score: number, comment: string, userId: number) {
+    const date = new Date().toISOString().split('T')[0];
+    return this.http.put(`${API_URL}/api/ratings/${ratingId}`, { score, comment, date, user: { id: userId } });
+  }
+
+  deleteRating(ratingId: number | string) {
+    return this.http.delete(`${API_URL}/api/ratings/${ratingId}`, { responseType: 'text' });
+  }
 }
