@@ -10,6 +10,7 @@ import { LibrarianDashboard } from '../pages/librarian-dashboard/librarian-dashb
 import { AdminDashboard } from '../pages/admin/admin';
 import { EditUser } from './components/edit-user/edit-user';
 import { DetailBook } from './components/detail-book/detail-book';
+import { adminGuard } from './guards/admin.guard';
 
 
 export const routes: Routes = [
@@ -19,9 +20,9 @@ export const routes: Routes = [
     { path: 'catalogue-management', component: CatalogManagement, canActivate: [authGuard]},
     { path: 'returns-management', component: ReturnsManagement, canActivate: [authGuard]},
     { path: 'librarian', component: LibrarianDashboard, canActivate: [authGuard]},
-    { path: 'admin', component: AdminDashboard, canActivate: [authGuard]},
-    { path: 'admin/edit-user/:id', component: EditUser, canActivate: [authGuard]},
     { path: 'detail-book/:id', component: DetailBook, canActivate: [authGuard]},
     { path: 'profil', component: Profil, canActivate: [authGuard] },
+    { path: 'admin', component: AdminDashboard, canActivate: [adminGuard]},
+    { path: 'admin/edit-user/:id', component: EditUser, canActivate: [adminGuard]},
     { path: '**', redirectTo: '', pathMatch: 'full' },
 ]
