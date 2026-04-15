@@ -12,6 +12,7 @@ import { AuthService } from '../../app/services/auth'
   selector: 'app-catalog-management',
   imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './catalog-management.html',
+  styleUrl: './catalog-management.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CatalogManagement implements OnInit {
