@@ -21,7 +21,8 @@
       >
 
     <div class="flex justify-between items-center w-full mt-4">
-      <p class="font-medium flex items-center gap-4">Disponibilité
+      <p class="font-medium flex items-center gap-4">
+        {{ isAvailable() ? 'Disponible' : 'Indisponible' }}
         <span class="w-4 h-4 rounded-full"
         [class.bg-green-600]="isAvailable()"
         [class.bg-red-600]="!isAvailable()">
