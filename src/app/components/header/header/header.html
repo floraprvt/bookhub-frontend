@@ -31,7 +31,13 @@
                         <hr class="border-gray-400 w-full">
                         <a routerLink="/profil" class="text-blue-950 font-semibold">Mes emprunts et réservations</a>
                         <hr class="border-gray-400 w-full">
-                        <a routerLink="/librarian" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
+                        @if (isLibrarian() || isAdmin()) {
+                            <a routerLink="/librarian" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
+                            <hr class="border-gray-400 w-full">
+                        }
+                        @if (isAdmin()) {
+                            <a routerLink="/admin" class="text-blue-950 font-semibold">Utilisateurs</a>
+                        }
                     </div>
                 </div>
             </div>
@@ -42,10 +48,10 @@
             <a href="" class="text-blue-950 font-semibold">Catalogue</a>
             <a routerLink="/profil" class="text-blue-950 font-semibold">Emprunts & réservations</a>
             @if (isLibrarian() || isAdmin()) {
-            <a routerLink="/librarian" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
+                <a routerLink="/librarian" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
             }
             @if (isAdmin()) {
-            <a routerLink="/admin" class="text-blue-950 font-semibold">Utilisateurs</a>
+                <a routerLink="/admin" class="text-blue-950 font-semibold">Utilisateurs</a>
             }
         </div>
     </div>

@@ -61,7 +61,7 @@
               @for (author of currentBook.author; track $index) {
               <p class="text-lg text-emerald-700 font-medium">De {{ author.firstName }} {{ author.lastName }}</p>
               }
-              <div class="flex items-center gap-4 mt-2">
+              <div class="flex items-center gap-4 mt-2 flex-wrap">
                 @for (category of currentBook.category; track $index) {
                 <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">{{ category.name }}</span>
                 }
