@@ -53,10 +53,10 @@ export class LibrarianDashboard implements OnInit, AfterViewInit {
       new Chart(canvas, {
         type: 'line',
         data: {
-          labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
+          labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
           datasets: [{
             label: 'Emprunts',
-            data: [120, 150, 180, 170, 220, 285],
+            data: [120, 150, 180, 170, 220, 285, 238, 190, 230, 130, 250, 200],
             borderColor: '#10b981',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             tension: 0.4,
