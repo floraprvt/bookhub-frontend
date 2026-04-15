@@ -16,7 +16,8 @@ export interface ReservedBook {
   bookTitle: string;
   bookImage: string;
   date: string;
-  rank: number;
+  queueRank: number;
+  canBorrow: boolean;
 }
 
 @Component({
@@ -44,6 +45,8 @@ export class Profil implements OnInit {
   loan = signal<Loan[]>([]);
   reservations = signal<ReservedBook[]>([]);
   history = signal<Loan[]>([]);
+  isBorrowingReservation = signal<number | null>(null);
+  borrowReservationError = signal<string | null>(null);
   isUpdating = signal(false);
   updateSuccess = signal(false);
   updateError = signal<string | false>(false);
@@ -213,11 +216,26 @@ export class Profil implements OnInit {
 
   cancelReservation(id: number) {
     this.reservationService.deleteMyReservations(id).subscribe({
+      next: () => this.loadReservations(),
+      error: (err) => console.log('error: ' + err),
+    });
+  }
+
+  borrowFromReservation(reservation: ReservedBook) {
+    this.isBorrowingReservation.set(reservation.id);
+    this.borrowReservationError.set(null);
+
+    this.loanService.createLoan(reservation.bookId).subscribe({
       next: () => {
+        this.isBorrowingReservation.set(null);
         this.loadReservations();
+        this.loadBooksData();
       },
       error: (err) => {
-        console.log('error: ' + err);
+        this.isBorrowingReservation.set(null);
+        this.borrowReservationError.set(
+          err.error?.error || err.error?.message || "Erreur lors de l'emprunt."
+        );
       },
     });
   }
