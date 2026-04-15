@@ -215,7 +215,6 @@ export class Profil implements OnInit {
     this.reservationService.deleteMyReservations(id).subscribe({
       next: () => {
         this.loadReservations();
-        alert('reservation canceled!');
       },
       error: (err) => {
         console.log('error: ' + err);
