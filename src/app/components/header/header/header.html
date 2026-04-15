@@ -5,12 +5,12 @@
     </a>
 
     <input class="hidden" id="panneauDeux" name="equipe" type="radio" checked>
-    <div class="flex items-center gap-4 justify-end w-full md:hidden">
+    <div class="flex items-center gap-4 justify-end w-full lg:hidden">
         <div id="panneauDeux-panneau" class="flex justify-center z-20 py-4 items-center">
             <input id="panneauUn" class="hidden menu-switch" name="equipe" type="radio">
             <div>
                 <label for="panneauUn" class="menu-open">
-                    <div class="md:hidden">
+                    <div class="lg:hidden">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>
                     </div>
                 </label>
@@ -39,7 +39,7 @@
                             <hr class="border-gray-400 w-full">
                         }
                         @if (isAdmin()) {
-                            <a routerLink="/admin" class="text-blue-950 font-semibold">Utilisateurs</a>
+                            <a routerLink="/admin" class="text-blue-950 font-semibold">Gestion utilisateurs</a>
                         }
                     </div>
                 </div>
@@ -47,7 +47,7 @@
         </div>
     </div>
 
-    <div class="hidden md:flex gap-4 h-fit">
+    <div class="hidden lg:flex gap-4 h-fit">
         <div class="flex gap-5">
             <a href="" class="text-blue-950 font-semibold">Catalogue</a>
             <a routerLink="/profil" class="text-blue-950 font-semibold">Emprunts & réservations</a>
@@ -55,7 +55,7 @@
                 <a routerLink="/librarian" class="text-blue-950 font-semibold">Espace bibliothécaire</a>
             }
             @if (isAdmin()) {
-                <a routerLink="/admin" class="text-blue-950 font-semibold">Utilisateurs</a>
+                <a routerLink="/admin" class="text-blue-950 font-semibold">Gestion utilisateurs</a>
             }
         </div>
     </div>
