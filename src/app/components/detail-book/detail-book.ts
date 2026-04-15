@@ -6,61 +6,66 @@ import { Book } from '../../interface'
 import { BookService } from '../../services/book'
 import { LoanService } from '../../services/loan'
 import { AuthService } from '../../services/auth'
+import { ReservationService } from '../../services/reservation.service';
 
 @Component({
   selector: 'app-detail-book',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './detail-book.html'
+  templateUrl: './detail-book.html',
 })
 export class DetailBook implements OnInit {
-  private route = inject(ActivatedRoute)
-  private router = inject(Router)
-  private bookService = inject(BookService)
-  private loanService = inject(LoanService)
-  private authService = inject(AuthService)
-  
-  book = signal<Book | null>(null)
-  ratings = signal<any[]>([])
-  starsArray = [1, 2, 3, 4, 5]
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private bookService = inject(BookService);
+  private loanService = inject(LoanService);
+  private authService = inject(AuthService);
+  private reservationService = inject(ReservationService);
+  alreadyReserved = signal(false);
+  book = signal<Book | null>(null);
+  ratings = signal<any[]>([]);
+  starsArray = [1, 2, 3, 4, 5];
 
-  currentUser = this.authService.currentUser
-  isAdmin = this.authService.isAdmin
-  isLibrarian = this.authService.isLibrarian
+  currentUser = this.authService.currentUser;
+  isAdmin = this.authService.isAdmin;
+  isLibrarian = this.authService.isLibrarian;
 
-  newScore = signal(0)
-  hoverScore = signal(0)
-  newComment = ''
-  isSubmitting = signal(false)
-  ratingSuccess = signal(false)
-  ratingError = signal<string | false>(false)
-  isBorrowing = signal(false)
-  borrowSuccess = signal(false)
-  borrowError = signal<string | false>(false)
-  borrowedReturnDate = signal<string | null>(null)
+  newScore = signal(0);
+  hoverScore = signal(0);
+  newComment = '';
+  isSubmitting = signal(false);
+  ratingSuccess = signal(false);
+  ratingError = signal<string | false>(false);
+  isBorrowing = signal(false);
+  borrowSuccess = signal(false);
+  borrowError = signal<string | false>(false);
+  borrowedReturnDate = signal<string | null>(null);
 
-  editingRatingId = signal<number | string | null>(null)
-  editScore = signal(0)
-  editHoverScore = signal(0)
-  editComment = ''
-  isEditing = signal(false)
+  editingRatingId = signal<number | string | null>(null);
+  editScore = signal(0);
+  editHoverScore = signal(0);
+  editComment = '';
+  isEditing = signal(false);
 
   ngOnInit() {
-    const bookParamId = this.route.snapshot.paramMap.get('id')
+    const bookParamId = this.route.snapshot.paramMap.get('id');
     if (bookParamId) {
-      const bookId = Number(bookParamId)
+      const bookId = Number(bookParamId);
       this.bookService.getBookById(bookId).subscribe({
-        next: (value) => this.book.set(value),
-        error: (error: any) => console.log(error)
-      })
-      this.loadRatings(bookId)
+        next: (value) => {
+          this.book.set(value);
+          this.checkReservation(bookId);
+        },
+        error: (error: any) => console.log(error),
+      });
+      this.loadRatings(bookId);
     }
   }
 
   loadRatings(bookId: number) {
     this.bookService.getRatings(bookId).subscribe({
-      next: (data) => this.ratings.set(data)
-    })
+      next: (data) => this.ratings.set(data),
+    });
   }
 
   getAverageRating(ratings?: any[]): number {
@@ -70,67 +75,91 @@ export class DetailBook implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/'])
+    this.router.navigate(['/']);
   }
 
   emprunter() {
-    const currentBook = this.book()
-    if (!currentBook) return
+    const currentBook = this.book();
+    if (!currentBook) return;
 
-    this.isBorrowing.set(true)
-    this.borrowSuccess.set(false)
-    this.borrowError.set(false)
-    this.borrowedReturnDate.set(null)
+    this.isBorrowing.set(true);
+    this.borrowSuccess.set(false);
+    this.borrowError.set(false);
+    this.borrowedReturnDate.set(null);
 
     this.loanService.createLoan(currentBook.id).subscribe({
-      next: (res: any) => { 
-        this.isBorrowing.set(false)
-        this.borrowSuccess.set(true)
+      next: (res: any) => {
+        this.isBorrowing.set(false);
+        this.borrowSuccess.set(true);
 
         if (res && res.returnDate) {
-           this.borrowedReturnDate.set(res.returnDate)
+          this.borrowedReturnDate.set(res.returnDate);
         }
 
-        this.book.update(b => b ? { ...b, isAvailable: false } : null)
+        this.book.update((b) => (b ? { ...b, isAvailable: false } : null));
       },
       error: (err) => {
-        this.isBorrowing.set(false)
-        const errorMessage = err.error?.error || err.error?.message || "Erreur lors de l'emprunt du livre."
-        
-        this.borrowError.set(errorMessage)
-      }
-    })
+        this.isBorrowing.set(false);
+        const errorMessage =
+          err.error?.error || err.error?.message || "Erreur lors de l'emprunt du livre.";
+
+        this.borrowError.set(errorMessage);
+      },
+    });
+  }
+  checkReservation(bookId: number) {
+    this.reservationService.hasReserved(bookId).subscribe({
+      next: (res) => {
+        this.alreadyReserved.set(res);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
   reserver() {
-    alert('Livre réservé ! Vous serez notifié dès qu\'il sera disponible.')
+    const currentBook = this.book();
+    if (!currentBook) return;
+    this.reservationService.createReservation(Number(currentBook.id)).subscribe({
+      next: () => {
+        this.checkReservation(Number(currentBook.id));
+      },
+      error: (err) => {
+        this.isBorrowing.set(false);
+        const errorMessage =
+          err.error?.error || err.error?.message || "Erreur lors de la réservation du livre.";
+
+        this.borrowError.set(errorMessage);
+      },
+    });
   }
 
   startEdit(review: any) {
-    this.editingRatingId.set(review.id)
-    this.editScore.set(review.score)
-    this.editComment = review.comment ?? ''
+    this.editingRatingId.set(review.id);
+    this.editScore.set(review.score);
+    this.editComment = review.comment ?? '';
   }
 
   cancelEdit() {
-    this.editingRatingId.set(null)
+    this.editingRatingId.set(null);
   }
 
   deleteRating(reviewId: number | string) {
-    const book = this.book()
-    if (!book) return
+    const book = this.book();
+    if (!book) return;
     this.bookService.deleteRating(reviewId).subscribe({
       next: () => this.loadRatings(Number(book.id)),
-      error: (err) => alert(err.error?.message ?? 'Une erreur est survenue.')
-    })
+      error: (err) => alert(err.error?.message ?? 'Une erreur est survenue.'),
+    });
   }
 
   submitEdit() {
-    const id = this.editingRatingId()
-    const book = this.book()
-    if (!id || !book) return
+    const id = this.editingRatingId();
+    const book = this.book();
+    if (!id || !book) return;
 
-    this.isEditing.set(true)
-    const userId = this.authService.currentUser()?.id!
+    this.isEditing.set(true);
+    const userId = this.authService.currentUser()?.id!;
     this.bookService.updateRating(id, this.editScore(), this.editComment, userId).subscribe({
       next: () => {
         this.isEditing.set(false)
@@ -145,25 +174,25 @@ export class DetailBook implements OnInit {
   }
 
   submitRating() {
-    const book = this.book()
-    if (!book || this.newScore() === 0) return
+    const book = this.book();
+    if (!book || this.newScore() === 0) return;
 
-    this.isSubmitting.set(true)
-    this.ratingSuccess.set(false)
-    this.ratingError.set(false)
+    this.isSubmitting.set(true);
+    this.ratingSuccess.set(false);
+    this.ratingError.set(false);
 
     this.bookService.addRating(book.id, this.newScore(), this.newComment).subscribe({
       next: () => {
-        this.isSubmitting.set(false)
-        this.ratingSuccess.set(true)
-        this.newScore.set(0)
-        this.newComment = ''
-        this.loadRatings(Number(book.id))
+        this.isSubmitting.set(false);
+        this.ratingSuccess.set(true);
+        this.newScore.set(0);
+        this.newComment = '';
+        this.loadRatings(Number(book.id));
       },
       error: (err) => {
-        this.isSubmitting.set(false)
-        this.ratingError.set(err.error?.message ?? 'Une erreur est survenue.')
-      }
-    })
+        this.isSubmitting.set(false);
+        this.ratingError.set(err.error?.message ?? 'Une erreur est survenue.');
+      },
+    });
   }
 }

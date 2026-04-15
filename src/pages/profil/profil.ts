@@ -7,14 +7,16 @@ import { forkJoin } from 'rxjs';
 import { Loan, RoleEnum, User } from '../../app/interface';
 import { ApiLoan, LoanService } from '../../app/services/loan';
 import { BookService } from '../../app/services/book';
+import { ReservationService } from '../../app/services/reservation.service';
 
 export interface ReservedBook {
   id: number;
-  title: string;
-  author: string;
-  coverUrl: string;
-  currentRank: number;
-  totalRank: number;
+  bookId: number;
+  userId: number;
+  bookTitle: string;
+  bookImage: string;
+  date: string;
+  rank: number;
 }
 
 @Component({
@@ -24,19 +26,19 @@ export interface ReservedBook {
   templateUrl: './profil.html',
   styleUrl: './profil.css',
 })
-
 export class Profil implements OnInit {
   private authService = inject(AuthService);
   private loanService = inject(LoanService);
   private bookService = inject(BookService);
+  private reservationService = inject(ReservationService);
   private router = inject(Router);
 
   user = signal<User>({
-    firstName: '', 
-    lastName: '', 
+    firstName: '',
+    lastName: '',
     email: '',
     id: '',
-    role: RoleEnum.USER
+    role: RoleEnum.USER,
   });
 
   loan = signal<Loan[]>([]);
@@ -59,6 +61,7 @@ export class Profil implements OnInit {
   ngOnInit() {
     this.loadUserData();
     this.loadBooksData();
+    this.loadReservations();
   }
 
   loadUserData() {
@@ -71,15 +74,26 @@ export class Profil implements OnInit {
         lastName: loggedInUser.lastName || '',
         email: loggedInUser.email || '',
         phone: loggedInUser.phone || '',
-        role: loggedInUser.role || RoleEnum.USER
+        role: loggedInUser.role || RoleEnum.USER,
       });
     }
+  }
+
+  loadReservations() {
+    this.reservationService.findMyReservations().subscribe({
+      next: (reservations) => {
+        this.reservations.set(reservations);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
   }
 
   loadBooksData() {
     forkJoin({
       myLoansData: this.loanService.getMyLoans(),
-      catalogData: this.bookService.getBooks()
+      catalogData: this.bookService.getBooks(),
     }).subscribe({
       next: ({ myLoansData, catalogData }) => {
         const allApiLoans = Object.values(myLoansData).flat();
@@ -88,8 +102,12 @@ export class Profil implements OnInit {
         const mapToGlobalLoan = (apiLoan: ApiLoan): Loan => {
           const dueDate = new Date(apiLoan.returnDate);
           const today = new Date();
-          const daysRemaining = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-          const realBook = allBooksInCatalog.find(b => b.id.toString() === apiLoan.bookId?.toString());
+          const daysRemaining = Math.ceil(
+            (dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24),
+          );
+          const realBook = allBooksInCatalog.find(
+            (b) => b.id.toString() === apiLoan.bookId?.toString(),
+          );
 
           return {
             id: apiLoan.id,
@@ -98,23 +116,28 @@ export class Profil implements OnInit {
             isReturned: apiLoan.isReturned,
             late: apiLoan.late,
             daysRemaining: daysRemaining > 0 ? daysRemaining : 0,
-            user: { id: apiLoan.userId, firstName: '', lastName: '', email: '', role: RoleEnum.USER },
+            user: {
+              id: apiLoan.userId,
+              firstName: '',
+              lastName: '',
+              email: '',
+              role: RoleEnum.USER,
+            },
             book: {
-              id: realBook?.id || 0, 
-              title: apiLoan.bookTitle, 
+              id: realBook?.id || 0,
+              title: apiLoan.bookTitle,
               image: realBook?.image || 'assets/livre.webp',
               author: realBook?.author || [{ id: 0, firstName: 'Auteur', lastName: 'Inconnu' }],
               category: realBook?.category || [],
-              isAvailable: false
-            }
+              isAvailable: false,
+            },
           };
         };
 
-        this.loan.set(allApiLoans.filter(l => !l.isReturned).map(mapToGlobalLoan));
-        this.history.set(allApiLoans.filter(l => l.isReturned).map(mapToGlobalLoan));
-        this.reservations.set([]);
+        this.loan.set(allApiLoans.filter((l) => !l.isReturned).map(mapToGlobalLoan));
+        this.history.set(allApiLoans.filter((l) => l.isReturned).map(mapToGlobalLoan));
       },
-      error: (err) => console.error('Erreur lors du chargement des données:', err)
+      error: (err) => console.error('Erreur lors du chargement des données:', err),
     });
   }
 
@@ -141,9 +164,9 @@ export class Profil implements OnInit {
             ? Object.entries(err.error)
                 .map(([key, msg]) => `${fieldLabels[key] ?? key} : ${msg}`)
                 .join(' | ')
-            : 'Une erreur est survenue, réessayez.'
+            : 'Une erreur est survenue, réessayez.',
         );
-      }
+      },
     });
   }
 
@@ -170,28 +193,38 @@ export class Profil implements OnInit {
         this.passwordError.set(
           err.error && typeof err.error === 'object'
             ? Object.values(err.error).join(' | ')
-            : err.error?.message ?? 'Une erreur est survenue, réessayez.'
+            : (err.error?.message ?? 'Une erreur est survenue, réessayez.'),
         );
-      }
+      },
     });
   }
 
   deleteAccount() {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
+    if (
+      !confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')
+    )
+      return;
 
     this.authService.deleteAccount().subscribe({
       next: () => this.router.navigate(['/login']),
-      error: (err) => alert(err.error?.message ?? 'Une erreur est survenue, réessayez.')
+      error: (err) => alert(err.error?.message ?? 'Une erreur est survenue, réessayez.'),
     });
   }
 
   cancelReservation(id: number) {
-    this.reservations.update(res => res.filter(r => r.id !== id));
+    this.reservationService.deleteMyReservations(id).subscribe({
+      next: () => {
+        this.loadReservations();
+      },
+      error: (err) => {
+        console.log('error: ' + err);
+      },
+    });
   }
 
   rateBook(id: string | number, rating: number) {
-    this.history.update(hist =>
-      hist.map(emprunt => emprunt.id === id ? { ...emprunt, rating } : emprunt)
+    this.history.update((hist) =>
+      hist.map((emprunt) => (emprunt.id === id ? { ...emprunt, rating } : emprunt)),
     );
   }
 
@@ -202,7 +235,7 @@ export class Profil implements OnInit {
 
   goToBook(bookId?: string | number) {
     if (bookId) {
-      this.router.navigate(['/detail-book', bookId])
+      this.router.navigate(['/detail-book', bookId]);
     }
   }
 }
