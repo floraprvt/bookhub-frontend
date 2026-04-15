@@ -1,16 +1,22 @@
 <main class="min-h-screen bg-gray-50 flex flex-col p-4 md:p-8">
   <div class="max-w-5xl mx-auto w-full flex flex-col gap-8 mt-4 md:mt-10">
-      @if(book(); as currentBook) {
+    @if (book(); as currentBook) {
       <div class="flex items-center gap-4">
-        <button (click)="goBack()" class="p-2 bg-white rounded-xl border border-gray-200 cursor-pointer" aria-label="Retour">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600"><path d="m15 18-6-6 6-6"/></svg>
+        <button (click)="goBack()" class="p-2 bg-white rounded-xl border border-gray-200 cursor-pointer"
+                aria-label="Retour">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               class="text-slate-600">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
         </button>
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-800">{{currentBook.title}}</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-800">{{ currentBook.title }}</h1>
       </div>
       <div class="flex flex-col lg:flex-row gap-8">
         <div class="w-full lg:w-1/3 flex flex-col gap-6">
           <div class="bg-white rounded-3xl p-6 border border-gray-100 flex justify-center">
-            <img [src]="currentBook.image || 'assets/livre.webp'" [alt]="currentBook.title" class="w-48 h-72 object-cover rounded-xl">
+            <img [src]="currentBook.image || 'assets/livre.webp'" [alt]="currentBook.title"
+                 class="w-48 h-72 object-cover rounded-xl">
           </div>
           <div class="bg-white rounded-3xl p-6 border border-gray-100">
             <div class="flex justify-between items-center mb-6">
@@ -18,11 +24,16 @@
               <span class="w-4 h-4 rounded-full" [ngClass]="currentBook.isAvailable ? 'bg-emerald-800' : 'bg-red-800'">
               </span>
             </div>
-            @if(borrowSuccess()) {
+            @if (borrowSuccess()) {
               <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex flex-col items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 mb-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="text-emerald-600 mb-1">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
                 <p class="text-sm text-emerald-900 font-bold text-center">Livre emprunté avec succès !</p>
-                @if(borrowedReturnDate()) {
+                @if (borrowedReturnDate()) {
                   <p class="text-sm text-emerald-800 text-center">
                     Date de retour : <span class="font-bold">{{ borrowedReturnDate() | date:'dd/MM/yyyy' }}</span>
                   </p>
@@ -30,26 +41,56 @@
                 <p class="text-xs text-emerald-700 text-center mt-1">Il a été ajouté à votre tableau de bord.</p>
               </div>
             } @else {
-              @if(currentBook.isAvailable) {
-                <button (click)="emprunter()" [disabled]="isBorrowing()" class="w-full bg-[#162D3A] text-white py-3 rounded-xl font-bold cursor-pointer flex items-center justify-center gap-2 hover:bg-blue-950 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                  @if(isBorrowing()) {
-                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              @if (currentBook.isAvailable) {
+                <button (click)="emprunter()" [disabled]="isBorrowing()"
+                        class="w-full bg-[#162D3A] text-white py-3 rounded-xl font-bold cursor-pointer flex items-center justify-center gap-2 hover:bg-blue-950 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  @if (isBorrowing()) {
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     Traitement...
                   } @else {
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                      <path d="M8 7h6" />
+                      <path d="M8 11h8" />
+                    </svg>
                     Emprunter ce livre
                   }
                 </button>
               } @else {
-                <button (click)="reserver()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold cursor-pointer flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>
-                  Réserver ce livre
+                <button
+                  (click)="reserver()"
+                  [disabled]="alreadyReserved()"
+                  [ngClass]="
+    alreadyReserved()
+      ? 'bg-gray-400 cursor-not-allowed'
+      : 'bg-emerald-600 hover:bg-emerald-700 cursor-pointer'
+  "
+                  class="w-full text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                       viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22v-5" />
+                    <path d="M9 8V2" />
+                    <path d="M15 8V2" />
+                    <path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z" />
+                  </svg>
+
+                  {{ alreadyReserved() ? 'Livre déjà réservé' : 'Réserver ce livre' }}
                 </button>
-                <p class="text-xs text-center text-gray-500 mt-3">Livre actuellement indisponible. Réservez-le pour être sur file d'attente.</p>
+                <p class="text-xs text-center text-gray-500 mt-3">Livre actuellement indisponible. Réservez-le pour être
+                  sur file d'attente.</p>
               }
             }
-            @if(borrowError()) {
-              <p class="text-sm text-red-700 font-medium text-center mt-4 bg-red-50 p-3 rounded-lg border border-red-100">{{ borrowError() }}</p>
+            @if (borrowError()) {
+              <p
+                class="text-sm text-red-700 font-medium text-center mt-4 bg-red-50 p-3 rounded-lg border border-red-100">{{ borrowError() }}</p>
             }
           </div>
         </div>
@@ -59,22 +100,28 @@
             <div class="flex flex-col gap-2 mb-6 border-b border-gray-100 pb-6">
               <h2 class="text-3xl font-bold text-[#162D3A]">{{ currentBook.title }}</h2>
               @for (author of currentBook.author; track $index) {
-              <p class="text-lg text-emerald-700 font-medium">De {{ author.firstName }} {{ author.lastName }}</p>
+                <p class="text-lg text-emerald-700 font-medium">De {{ author.firstName }} {{ author.lastName }}</p>
               }
               <div class="flex items-center gap-4 mt-2 flex-wrap">
                 @for (category of currentBook.category; track $index) {
-                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">{{ category.name }}</span>
+                  <span
+                    class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">{{ category.name }}</span>
                 }
                 <span class="text-gray-500 text-sm">ISBN: {{ currentBook.isbn }}</span>
-                
+
                 <div class="flex items-center gap-1 ml-auto">
                   <span class="font-bold text-slate-800 mr-1">{{ getAverageRating(ratings()) }}</span>
-                  @for(star of starsArray; track star) {
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="star <= getAverageRating(ratings()) ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  @for (star of starsArray; track star) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         [ngClass]="star <= getAverageRating(ratings()) ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'">
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
                   }
                 </div>
               </div>
-            </div>          
+            </div>
             <div class="flex flex-col gap-3 text-slate-700 leading-relaxed">
               <h3 class="font-bold text-lg text-slate-800 mb-1">Résumé</h3>
               <p>{{ currentBook.description }}</p>
@@ -86,12 +133,12 @@
               <span class="text-sm text-gray-500">{{ ratings().length }} commentaire(s)</span>
             </div>
             <div class="flex flex-col gap-4">
-              @for(review of ratings(); track $index) {
+              @for (review of ratings(); track $index) {
                 <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                  @if(editingRatingId() === review.id) {
+                  @if (editingRatingId() === review.id) {
                     <div class="flex flex-col gap-3">
                       <div class="flex items-center gap-1">
-                        @for(star of starsArray; track star) {
+                        @for (star of starsArray; track star) {
                           <svg
                             (click)="editScore.set(star)"
                             (mouseenter)="editHoverScore.set(star)"
@@ -100,16 +147,21 @@
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="cursor-pointer transition-colors"
                             [ngClass]="star <= (editHoverScore() || editScore()) ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            <polygon
+                              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>
                         }
                       </div>
                       <textarea [(ngModel)]="editComment" name="editComment" rows="2"
-                        class="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none resize-none text-sm">
+                                class="w-full px-3 py-2 rounded-xl border border-gray-300 outline-none resize-none text-sm">
                       </textarea>
                       <div class="flex gap-2 justify-end">
-                        <button type="button" (click)="cancelEdit()" class="px-4 py-1.5 rounded-lg text-sm text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">Annuler</button>
-                        <button type="button" (click)="submitEdit()" [disabled]="isEditing()" class="px-4 py-1.5 rounded-lg text-sm text-white bg-[#162D3A] hover:bg-blue-950 transition-colors disabled:opacity-50">
+                        <button type="button" (click)="cancelEdit()"
+                                class="px-4 py-1.5 rounded-lg text-sm text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">
+                          Annuler
+                        </button>
+                        <button type="button" (click)="submitEdit()" [disabled]="isEditing()"
+                                class="px-4 py-1.5 rounded-lg text-sm text-white bg-[#162D3A] hover:bg-blue-950 transition-colors disabled:opacity-50">
                           {{ isEditing() ? 'Enregistrement...' : 'Sauvegarder' }}
                         </button>
                       </div>
@@ -122,29 +174,52 @@
                       </div>
                       <div class="flex items-center gap-2">
                         <div class="flex gap-1">
-                          @for(star of starsArray; track star) {
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="star <= review.score ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                          @for (star of starsArray; track star) {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 [ngClass]="star <= review.score ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'">
+                              <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
                           }
                         </div>
-                        @if(currentUser()?.id === review.user.id) {
-                          <button (click)="startEdit(review)" class="text-gray-400 hover:text-[#162D3A] transition-colors" aria-label="Editer l'avis">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        @if (currentUser()?.id === review.user.id) {
+                          <button (click)="startEdit(review)"
+                                  class="text-gray-400 hover:text-[#162D3A] transition-colors"
+                                  aria-label="Editer l'avis">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" class="h-5 w-5"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M12 20h9" />
+                              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                            </svg>
                           </button>
                         }
-                        @if(isAdmin() || isLibrarian()) {
-                          <button (click)="deleteRating(review.id)" class="text-gray-400 hover:text-red-600 transition-colors" aria-label="Supprimer l'avis">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                        @if (isAdmin() || isLibrarian()) {
+                          <button (click)="deleteRating(review.id)"
+                                  class="text-gray-400 hover:text-red-600 transition-colors"
+                                  aria-label="Supprimer l'avis">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" class="h-5 w-5"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <path d="M10 11v6" />
+                              <path d="M14 11v6" />
+                              <path d="M9 6V4h6v2" />
+                            </svg>
                           </button>
                         }
                       </div>
                     </div>
-                    @if(review.comment) {
+                    @if (review.comment) {
                       <p class="text-slate-700 text-sm">{{ review.comment }}</p>
                     }
                   }
                 </div>
               } @empty {
-                <p class="text-center text-gray-500 py-4 italic">Aucun avis pour le moment. Soyez le premier à noter ce livre après l'avoir lu !</p>
+                <p class="text-center text-gray-500 py-4 italic">Aucun avis pour le moment. Soyez le premier à noter ce
+                  livre après l'avoir lu !</p>
               }
             </div>
 
@@ -152,7 +227,7 @@
               <h4 class="font-bold text-slate-800 mb-4">Laisser un avis</h4>
               <form (ngSubmit)="submitRating()" class="flex flex-col gap-4">
                 <div class="flex items-center gap-1">
-                  @for(star of starsArray; track star) {
+                  @for (star of starsArray; track star) {
                     <svg
                       (click)="newScore.set(star)"
                       (mouseenter)="hoverScore.set(star)"
@@ -161,10 +236,11 @@
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                       class="cursor-pointer transition-colors"
                       [ngClass]="star <= (hoverScore() || newScore()) ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
                   }
-                  @if(newScore() > 0) {
+                  @if (newScore() > 0) {
                     <span class="ml-2 text-sm text-gray-500">{{ newScore() }}/5</span>
                   }
                 </div>
@@ -174,10 +250,10 @@
                   rows="3"
                   class="w-full px-4 py-3 rounded-xl border border-gray-300 outline-none resize-none text-sm">
                 </textarea>
-                @if(ratingSuccess()) {
+                @if (ratingSuccess()) {
                   <p class="text-sm text-green-600">Avis publié avec succès !</p>
                 }
-                @if(ratingError()) {
+                @if (ratingError()) {
                   <p class="text-sm text-red-600">{{ ratingError() }}</p>
                 }
                 <button
@@ -194,7 +270,12 @@
       </div>
     } @else {
       <div class="flex justify-center items-center h-64 text-gray-500">
-        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-[#162D3A]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-[#162D3A]" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
         Chargement des informations du livre...
       </div>
     }
