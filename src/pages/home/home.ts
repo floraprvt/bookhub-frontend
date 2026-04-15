@@ -129,7 +129,6 @@ export class Home implements OnInit {
     this.selectedAvailability.set('all')
     this.currentPage.set(1)
     this.totalPages.set(0)
-    this.router.navigateByUrl('/products')
     this.loadAllBooks()
     this.closeFilterModal()
   }
