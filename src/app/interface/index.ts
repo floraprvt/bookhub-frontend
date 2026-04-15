@@ -87,14 +87,18 @@ export interface BooksPageResponse {
 }
 
 export interface Loan {
-    id: number | string;
-    loanDate: Date | string;
-    returnDate: Date | string;
+    id: number;
+    loanDate: string;
+    returnDate: string;
     isReturned: boolean;
-    user: User;
-    book: Book;
-    late?: boolean; 
-    daysRemaining?: number; 
+    user?: User;
+    book?: Book;
+    bookId?: number;
+    firstName?: string;
+    lastName?: string;
+    bookTitle?: string;
+    late?: boolean;
+    daysRemaining?: number;
 }
 
 export interface Rating {

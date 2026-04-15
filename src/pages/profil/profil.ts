@@ -8,17 +8,6 @@ import { Loan, RoleEnum, User } from '../../app/interface';
 import { ApiLoan, LoanService } from '../../app/services/loan';
 import { BookService } from '../../app/services/book';
 
-
-export interface BorrowedBook {
-  id: number;
-  title: string;
-  author: string;
-  coverUrl: string;
-  dueDate: Date;
-  isOverdue: boolean;
-  daysRemaining?: number;
-}
-
 export interface ReservedBook {
   id: number;
   title: string;
@@ -26,15 +15,6 @@ export interface ReservedBook {
   coverUrl: string;
   currentRank: number;
   totalRank: number;
-}
-
-export interface HistoryBook {
-  id: number;
-  title: string;
-  author: string;
-  coverUrl: string;
-  returnedDate: Date;
-  rating: number;
 }
 
 @Component({
@@ -49,6 +29,7 @@ export class Profil implements OnInit {
   private authService = inject(AuthService);
   private loanService = inject(LoanService);
   private bookService = inject(BookService);
+  private router = inject(Router);
 
   user = signal<User>({
     firstName: '', 
@@ -110,13 +91,6 @@ export class Profil implements OnInit {
           const daysRemaining = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
           const realBook = allBooksInCatalog.find(b => b.id.toString() === apiLoan.bookId?.toString());
 
-          console.log(`--- ANALYSE EMPRUNT (Livre ID attendu : ${apiLoan.bookId}) ---`);
-          console.log("1. Livre trouvé dans le catalogue Angular ?", realBook ? "OUI (" + realBook.title + ")" : "NON ❌");
-          if (realBook) {
-            console.log("2. Contenu de la case 'author' de ce livre :", realBook.author);
-          }
-          console.log("---------------------------------------------------");
-
           return {
             id: apiLoan.id,
             loanDate: apiLoan.loanDate,
@@ -129,25 +103,20 @@ export class Profil implements OnInit {
               id: realBook?.id || 0, 
               title: apiLoan.bookTitle, 
               image: realBook?.image || 'assets/livre.webp',
-              author: (realBook?.author && realBook.author.length > 0) 
-                        ? realBook.author 
-                        : [{ id: 0, firstName: 'Auteur', lastName: 'Inconnu' }],
+              author: realBook?.author || [{ id: 0, firstName: 'Auteur', lastName: 'Inconnu' }],
               category: realBook?.category || [],
               isAvailable: false
             }
           };
         };
 
-        const activeLoans = allApiLoans.filter(l => !l.isReturned).map(mapToGlobalLoan);
-        const pastLoans = allApiLoans.filter(l => l.isReturned).map(mapToGlobalLoan);
-
-        this.loan.set(activeLoans);
-        this.history.set(pastLoans);
+        this.loan.set(allApiLoans.filter(l => !l.isReturned).map(mapToGlobalLoan));
+        this.history.set(allApiLoans.filter(l => l.isReturned).map(mapToGlobalLoan));
         this.reservations.set([]);
       },
       error: (err) => console.error('Erreur lors du chargement des données:', err)
     });
-}
+  }
 
   updateProfile() {
     const { firstName, lastName, phone } = this.user();
@@ -226,10 +195,14 @@ export class Profil implements OnInit {
     );
   }
 
- private readonly router = inject(Router);
-
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  goToBook(bookId?: string | number) {
+    if (bookId) {
+      this.router.navigate(['/detail-book', bookId])
+    }
   }
 }
