@@ -26,7 +26,14 @@ export class Login {
 
     this.authService.login(this.user.email, this.user.password).subscribe({
       next: () => {
-        this.router.navigate(['/profil']);
+        const user = this.authService.currentUser();
+        if (user?.role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        } else if (user?.role === 'LIBRARIAN') {
+          this.router.navigate(['/librarian']);
+        } else {
+          this.router.navigate(['/profil']);
+        }
       },
       error: (err) => {
         this.isLoading.set(false);
