@@ -134,6 +134,9 @@
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
           <h3 class="text-xl font-bold mb-4">Mes réservations</h3>
 
+          @if (borrowReservationError()) {
+            <p class="text-sm text-red-600 mb-3">{{ borrowReservationError() }}</p>
+          }
           <div class="flex overflow-x-auto gap-4 snap-x pb-2 hide-scrollbar">
             @for(ReservedBook of reservations(); track ReservedBook.id) {
               <div class="snap-start shrink-0 w-full sm:w-[320px] bg-gray-50 rounded-2xl p-3 flex gap-4 border border-gray-200">
@@ -141,11 +144,21 @@
                 <div class="flex flex-col justify-between flex-1">
                   <div>
                     <h4 class="font-bold text-sm line-clamp-2">{{ ReservedBook.bookTitle }}</h4>
-                    <p class="text-sm font-medium mt-1">Note : {{ ReservedBook.rank }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Position dans la file : {{ ReservedBook.queueRank }}</p>
                   </div>
-                  <button (click)="cancelReservation(ReservedBook.id)" class="bg-gray-500 hover:bg-gray-600 text-white text-xs font-medium py-2 rounded-lg mt-2 transition-colors">
-                    Annuler la réservation
-                  </button>
+                  <div class="flex flex-col gap-2 mt-2">
+                    @if (ReservedBook.canBorrow) {
+                      <button
+                        (click)="borrowFromReservation(ReservedBook)"
+                        [disabled]="isBorrowingReservation() === ReservedBook.id"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                        {{ isBorrowingReservation() === ReservedBook.id ? 'Emprunt en cours...' : 'Emprunter maintenant' }}
+                      </button>
+                    }
+                    <button (click)="cancelReservation(ReservedBook.id)" class="bg-gray-500 hover:bg-gray-600 text-white text-xs font-medium py-2 rounded-lg transition-colors">
+                      Annuler la réservation
+                    </button>
+                  </div>
                 </div>
               </div>
             } @empty {
