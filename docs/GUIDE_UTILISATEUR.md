@@ -1,7 +1,5 @@
 # Guide Utilisateur – BookHub
 
-Plateforme de gestion de bibliothèque communautaire.
-
 ---
 
 ## Table des matières
@@ -33,6 +31,9 @@ Trois types de profils existent :
 
 ### S'inscrire
 
+![Register](screenshots/register.png)
+
+
 1. Accéder à la page `/register`
 2. Renseigner les champs :
    - **Prénom** et **Nom** (obligatoires)
@@ -44,6 +45,7 @@ Trois types de profils existent :
 Le compte est créé avec le rôle **Lecteur** par défaut.
 
 ### Se connecter
+![Login](screenshots/login.png)
 
 1. Accéder à la page `/login`
 2. Renseigner l'**email** et le **mot de passe**
@@ -60,6 +62,8 @@ Cliquer sur le bouton **Déconnexion** disponible sur la page profil (en bas de 
 ## Guide Lecteur
 
 ### Consulter le catalogue
+
+![Catalogue](screenshots/catalogue.png)
 
 La page d'accueil affiche la liste des livres disponibles sous forme de cartes.
 
@@ -79,6 +83,8 @@ Cliquer sur une carte pour accéder à la fiche détaillée du livre.
 ---
 
 ### Fiche détaillée d'un livre
+
+![Details](screenshots/details.png)
 
 La fiche d'un livre affiche :
 - La couverture, le titre, l'auteur, la catégorie, l'ISBN
@@ -105,6 +111,8 @@ En bas de la fiche d'un livre, un formulaire permet de laisser un avis :
 ---
 
 ### Mon profil
+
+![Profil](screenshots/userDashboard.png)
 
 Accessible via l'icône utilisateur en haut à droite ou le lien **Emprunts & réservations**.
 
@@ -133,6 +141,7 @@ Accessible via l'icône utilisateur en haut à droite ou le lien **Emprunts & r�
 > Accès réservé aux comptes avec le rôle **LIBRARIAN** ou **ADMIN**.
 
 ### Tableau de bord (`/librarian`)
+![Librarian](screenshots/librarianDashboard.png)
 
 Le tableau de bord affiche en temps réel :
 - **Nombre total de livres** dans le catalogue
@@ -203,6 +212,8 @@ Sur la fiche détaillée de n'importe quel livre, les bibliothécaires voient un
 L'administrateur dispose de toutes les fonctionnalités du bibliothécaire, plus la gestion des utilisateurs.
 
 ### Gestion des utilisateurs (`/admin`)
+
+![Admin](screenshots/adminDashboard.png)
 
 La page liste l'ensemble des comptes enregistrés.
 
