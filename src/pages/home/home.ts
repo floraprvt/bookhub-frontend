@@ -34,7 +34,7 @@ export class Home implements OnInit {
   isFilterModalOpen = signal<boolean>(false)
   currentPage = signal<number>(1)
   itemsPerPage = 20
-  sortOrder = 'title,asc'
+  sortOrder = signal<string>('title,asc')
   totalPages = signal<number>(0)
   filteredProducts = computed(() => this.products())
 
@@ -71,7 +71,7 @@ export class Home implements OnInit {
 
   private loadAllBooks() {
     const currentBackendPage = this.currentPage() - 1
-    this.bookService.getBooks(currentBackendPage, this.itemsPerPage, this.sortOrder).subscribe({
+    this.bookService.getBooks(currentBackendPage, this.itemsPerPage, this.sortOrder()).subscribe({
       next: value => {
         this.products.set(value.content)
         this.totalPages.set(Math.max(value.totalPages ?? 0, 0))
@@ -88,6 +88,12 @@ export class Home implements OnInit {
     this.currentPage.set(1)
     this.executeSearch()
     this.closeFilterModal()
+  }
+
+  onSortChange(sort: string) {
+    this.sortOrder.set(sort)
+    this.currentPage.set(1)
+    this.executeSearch()
   }
 
   openFilterModal() {
@@ -127,6 +133,7 @@ export class Home implements OnInit {
     this.selectedAuthorIds.set([])
     this.publishedDate.set('')
     this.selectedAvailability.set('all')
+    this.sortOrder.set('title,asc')
     this.currentPage.set(1)
     this.totalPages.set(0)
     this.loadAllBooks()
@@ -226,7 +233,7 @@ export class Home implements OnInit {
 
     search.page = this.currentPage() - 1
     search.size = this.itemsPerPage
-    search.sort = this.sortOrder
+    search.sort = this.sortOrder()
 
     this.bookService.searchBooks(search).subscribe({
       next: value => {
